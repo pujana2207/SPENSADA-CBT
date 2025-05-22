@@ -231,6 +231,100 @@
       z-index: 9999;
     }
     
+    /* Enhanced floating window warning */
+    .floating-warning {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #ef4444;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      z-index: 3000;
+      display: flex;
+      align-items: center;
+      animation: shake 0.5s ease-in-out;
+      max-width: 90%;
+    }
+    
+    .floating-warning.critical {
+      background-color: #dc2626;
+      animation: pulse 1s infinite;
+    }
+    
+    @keyframes shake {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      20%, 60% { transform: translateX(-50%) translateY(-5px); }
+      40%, 80% { transform: translateX(-50%) translateY(5px); }
+    }
+    
+    @keyframes pulse {
+      0%, 100% { transform: translateX(-50%) scale(1); }
+      50% { transform: translateX(-50%) scale(1.05); }
+    }
+    
+    /* Security monitoring overlay */
+    .security-monitor {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background-color: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      z-index: 2500;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      min-width: 250px;
+    }
+    
+    .security-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .security-status {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    
+    .status-ok {
+      color: #10b981;
+    }
+    
+    .status-warning {
+      color: #f59e0b;
+    }
+    
+    .status-error {
+      color: #ef4444;
+    }
+    
+    /* Split screen detection indicator */
+    .split-screen-indicator {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      background-color: #ef4444;
+      color: white;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      z-index: 2500;
+      animation: blink 1s infinite;
+    }
+    
+    @keyframes blink {
+      0%, 50% { opacity: 1; }
+      51%, 100% { opacity: 0.5; }
+    }
+    
     @media (max-width: 640px) {
       .mobile-padding {
         padding: 1rem;
@@ -275,19 +369,37 @@
         height: 45px;
         font-size: 0.9rem;
       }
+      
+      .floating-warning {
+        width: 90%;
+        padding: 10px 16px;
+        font-size: 0.9rem;
+      }
+      
+      .security-monitor {
+        right: 10px;
+        top: 10px;
+        min-width: 200px;
+        font-size: 0.8rem;
+      }
+      
+      .split-screen-indicator {
+        left: 10px;
+        bottom: 10px;
+      }
     }
   </style>
 </head>
 <body class="flex items-center justify-center p-4 mobile-padding">
   <div class="w-full max-w-md mx-auto">
     <!-- Main Card -->
-    <div class="card p-8 mb-6">
+    <div id="mainCard" class="card p-8 mb-6">
       <!-- Logo/Header -->
       <div class="text-center mb-8">
         <div class="w-20 h-20 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
           <img src="https://i.ibb.co.com/3YjdDh2N/logo-sekolah-FINAL.png" alt="Logo Sekolah" class="h-14 w-14 object-contain">
         </div>
-        <h1 class="text-2xl font-bold text-gray-800 mobile-text">Sistem Ujian Digital SMP Negeri 1 Sukasada</h1>
+        <h1 class="text-2xl font-bold text-gray-800 mobile-text">Sistem Ujian Digital</h1>
         <p class="text-gray-600 mt-2">Scan QR Code atau masukkan token untuk memulai ujian</p>
       </div>
       
@@ -386,8 +498,8 @@
           class="w-full px-4 py-3 rounded-lg input-field select-field focus:outline-none"
         >
           <option value="">-- Pilih Mapel --</option>
-         <option value="SIM">SIMULASI</option>
-           <!--<option value="AGAMA">Agama</option>
+          <option value="SIM">SIMULASI</option>
+          <!--<option value="AGAMA">Agama</option>
           <option value="BINDO">Bahasa Indonesia</option>
           <option value="BING">Bahasa Inggris</option>
           <option value="BAL">Bahasa Bali</option>
@@ -422,7 +534,7 @@
     
     <!-- Footer -->
     <div class="text-center text-gray-500 text-sm">
-      <p>Sistem Ujian Digital © 2025 . SMP Negeri 1 Sukasada. Gede Pujana</p>
+      <p>Sistem Ujian Digital © 2023</p>
       <p class="mt-1">
         <i class="fas fa-shield-alt mr-1"></i> Mode aman diaktifkan
       </p>
@@ -453,6 +565,50 @@
     </div>
   </div>
 
+  <!-- Security Monitor (Hidden Initially) -->
+  <div id="securityMonitor" class="security-monitor hidden">
+    <div class="security-item">
+      <span>Fullscreen:</span>
+      <div class="security-status">
+        <i id="fullscreenIcon" class="fas fa-circle status-ok"></i>
+        <span id="fullscreenStatus">Aktif</span>
+      </div>
+    </div>
+    <div class="security-item">
+      <span>Window Focus:</span>
+      <div class="security-status">
+        <i id="focusIcon" class="fas fa-circle status-ok"></i>
+        <span id="focusStatus">Aktif</span>
+      </div>
+    </div>
+    <div class="security-item">
+      <span>Split Screen:</span>
+      <div class="security-status">
+        <i id="splitIcon" class="fas fa-circle status-ok"></i>
+        <span id="splitStatus">Tidak Terdeteksi</span>
+      </div>
+    </div>
+    <div class="security-item">
+      <span>Floating Window:</span>
+      <div class="security-status">
+        <i id="floatingIcon" class="fas fa-circle status-ok"></i>
+        <span id="floatingStatus">Tidak Terdeteksi</span>
+      </div>
+    </div>
+    <div class="security-item">
+      <span>Pelanggaran:</span>
+      <div class="security-status">
+        <span id="violationCount">0/3</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Split Screen Indicator (Hidden Initially) -->
+  <div id="splitScreenIndicator" class="split-screen-indicator hidden">
+    <i class="fas fa-exclamation-triangle mr-1"></i>
+    SPLIT SCREEN TERDETEKSI
+  </div>
+
   <!-- Violation Overlay (Hidden Initially) -->
   <div id="violationOverlay" class="violation-overlay hidden">
     <div class="violation-icon">
@@ -464,6 +620,12 @@
     <div class="violation-timer">
       Ujian akan dihentikan dalam: <span id="violationTimer">5</span> detik
     </div>
+  </div>
+
+  <!-- Floating Warning (Hidden Initially) -->
+  <div id="floatingWarning" class="floating-warning hidden">
+    <i class="fas fa-exclamation-triangle mr-2"></i>
+    <span>Anda terdeteksi menggunakan mode jendela mengambang atau belah layar!</span>
   </div>
 
   <!-- Hidden Canvas for Screenshots -->
@@ -482,6 +644,8 @@
     const tokenRahasia = "UJIAN2025";
     const SCREENSHOT_INTERVAL = 30000; // 30 seconds
     const VIOLATION_TIMEOUT = 5000; // 5 seconds
+    const WARNING_DURATION = 10000; // 10 seconds
+    const SECURITY_CHECK_INTERVAL = 500; // 500ms for more frequent checks
     
     // Form links configuration
     const formLinks = {
@@ -538,6 +702,21 @@
     const violationMessage = document.getElementById('violationMessage');
     const violationTimer = document.getElementById('violationTimer');
     const examTimer = document.getElementById('examTimer');
+    const floatingWarning = document.getElementById('floatingWarning');
+    const mainCard = document.getElementById('mainCard');
+    const securityMonitor = document.getElementById('securityMonitor');
+    const splitScreenIndicator = document.getElementById('splitScreenIndicator');
+    
+    // Security Monitor Elements
+    const fullscreenIcon = document.getElementById('fullscreenIcon');
+    const fullscreenStatus = document.getElementById('fullscreenStatus');
+    const focusIcon = document.getElementById('focusIcon');
+    const focusStatus = document.getElementById('focusStatus');
+    const splitIcon = document.getElementById('splitIcon');
+    const splitStatus = document.getElementById('splitStatus');
+    const floatingIcon = document.getElementById('floatingIcon');
+    const floatingStatus = document.getElementById('floatingStatus');
+    const violationCountDisplay = document.getElementById('violationCount');
     
     // Audio Elements
     const audioSukses = document.getElementById('audioSukses');
@@ -553,8 +732,25 @@
     let screenshotInterval;
     let examStartTime;
     let examDurationInterval;
-    let splitScreenCheckInterval;
+    let securityCheckInterval;
     let violationCountdown;
+    let warningTimeout;
+    let isWarningActive = false;
+    let violationCount = 0;
+    let isExamActive = false;
+    const MAX_VIOLATIONS = 3;
+    
+    // Security state tracking
+    let securityState = {
+      isFullscreen: false,
+      isWindowFocused: true,
+      isSplitScreen: false,
+      isFloatingWindow: false,
+      lastWindowWidth: window.innerWidth,
+      lastWindowHeight: window.innerHeight,
+      lastScreenWidth: screen.width,
+      lastScreenHeight: screen.height
+    };
     
     // Toggle password visibility
     togglePassword.addEventListener('click', () => {
@@ -699,6 +895,245 @@
       }
     }
     
+    // Enhanced Security Detection Functions
+    function detectFloatingWindow() {
+      const windowRatio = window.innerWidth / window.innerHeight;
+      const screenRatio = screen.width / screen.height;
+      
+      // Check if window is significantly smaller than screen
+      const widthRatio = window.innerWidth / screen.width;
+      const heightRatio = window.innerHeight / screen.height;
+      
+      // Floating window indicators
+      const isSmallWindow = widthRatio < 0.8 || heightRatio < 0.8;
+      const hasUnusualAspectRatio = Math.abs(windowRatio - screenRatio) > 0.5;
+      const isNotFullscreen = !document.fullscreenElement && 
+                             !document.webkitFullscreenElement && 
+                             !document.mozFullScreenElement && 
+                             !document.msFullscreenElement;
+      
+      // Check for picture-in-picture or overlay mode
+      const isPictureInPicture = window.innerWidth < 800 && window.innerHeight < 600;
+      
+      return isNotFullscreen && (isSmallWindow || hasUnusualAspectRatio || isPictureInPicture);
+    }
+    
+    function detectSplitScreen() {
+      // Method 1: Window size compared to screen size
+      const widthRatio = window.innerWidth / screen.width;
+      const heightRatio = window.innerHeight / screen.height;
+      
+      // Method 2: Check for common split screen ratios
+      const isHalfWidth = Math.abs(widthRatio - 0.5) < 0.1;
+      const isHalfHeight = Math.abs(heightRatio - 0.5) < 0.1;
+      const isTwoThirds = Math.abs(widthRatio - 0.67) < 0.1 || Math.abs(widthRatio - 0.33) < 0.1;
+      
+      // Method 3: Detect sudden size changes
+      const hasSignificantSizeChange = 
+        Math.abs(window.innerWidth - securityState.lastWindowWidth) > 100 ||
+        Math.abs(window.innerHeight - securityState.lastWindowHeight) > 100;
+      
+      // Method 4: Check if window is not maximized but also not minimized
+      const isPartialSize = (widthRatio < 0.95 && widthRatio > 0.3) || 
+                           (heightRatio < 0.95 && heightRatio > 0.3);
+      
+      return isHalfWidth || isHalfHeight || isTwoThirds || (hasSignificantSizeChange && isPartialSize);
+    }
+    
+    function detectMultitasking() {
+      // Check for multitasking indicators
+      const isMultitasking = 
+        !document.hasFocus() || 
+        document.hidden || 
+        window.outerWidth !== window.innerWidth + (window.outerWidth - window.innerWidth);
+      
+      return isMultitasking;
+    }
+    
+    function performSecurityCheck() {
+      if (!isExamActive) return;
+      
+      // Update security state
+      const wasFullscreen = securityState.isFullscreen;
+      const wasFocused = securityState.isWindowFocused;
+      const wasSplitScreen = securityState.isSplitScreen;
+      const wasFloatingWindow = securityState.isFloatingWindow;
+      
+      // Current security status
+      securityState.isFullscreen = !!(document.fullscreenElement || 
+                                     document.webkitFullscreenElement || 
+                                     document.mozFullScreenElement || 
+                                     document.msFullscreenElement);
+      
+      securityState.isWindowFocused = document.hasFocus() && !document.hidden;
+      securityState.isSplitScreen = detectSplitScreen();
+      securityState.isFloatingWindow = detectFloatingWindow();
+      
+      // Update security monitor display
+      updateSecurityMonitor();
+      
+      // Check for violations
+      let violationType = null;
+      let violationMessage = '';
+      
+      if (!securityState.isFullscreen && wasFullscreen) {
+        violationType = 'fullscreen_exit';
+        violationMessage = 'Anda keluar dari mode fullscreen!';
+      } else if (!securityState.isWindowFocused && wasFocused) {
+        violationType = 'focus_lost';
+        violationMessage = 'Anda berpindah ke aplikasi lain!';
+      } else if (securityState.isSplitScreen && !wasSplitScreen) {
+        violationType = 'split_screen';
+        violationMessage = 'Terdeteksi mode split screen!';
+      } else if (securityState.isFloatingWindow && !wasFloatingWindow) {
+        violationType = 'floating_window';
+        violationMessage = 'Terdeteksi jendela mengambang atau overlay!';
+      } else if (detectMultitasking()) {
+        violationType = 'multitasking';
+        violationMessage = 'Terdeteksi multitasking atau tab switching!';
+      }
+      
+      if (violationType) {
+        handleSecurityViolation(violationType, violationMessage);
+      }
+      
+      // Update window dimensions for next check
+      securityState.lastWindowWidth = window.innerWidth;
+      securityState.lastWindowHeight = window.innerHeight;
+      
+      // Show/hide split screen indicator
+      if (securityState.isSplitScreen || securityState.isFloatingWindow) {
+        splitScreenIndicator.classList.remove('hidden');
+      } else {
+        splitScreenIndicator.classList.add('hidden');
+      }
+    }
+    
+    function updateSecurityMonitor() {
+      // Update fullscreen status
+      if (securityState.isFullscreen) {
+        fullscreenIcon.className = 'fas fa-circle status-ok';
+        fullscreenStatus.textContent = 'Aktif';
+      } else {
+        fullscreenIcon.className = 'fas fa-circle status-error';
+        fullscreenStatus.textContent = 'Tidak Aktif';
+      }
+      
+      // Update focus status
+      if (securityState.isWindowFocused) {
+        focusIcon.className = 'fas fa-circle status-ok';
+        focusStatus.textContent = 'Aktif';
+      } else {
+        focusIcon.className = 'fas fa-circle status-error';
+        focusStatus.textContent = 'Tidak Aktif';
+      }
+      
+      // Update split screen status
+      if (securityState.isSplitScreen) {
+        splitIcon.className = 'fas fa-circle status-error';
+        splitStatus.textContent = 'Terdeteksi';
+      } else {
+        splitIcon.className = 'fas fa-circle status-ok';
+        splitStatus.textContent = 'Tidak Terdeteksi';
+      }
+      
+      // Update floating window status
+      if (securityState.isFloatingWindow) {
+        floatingIcon.className = 'fas fa-circle status-error';
+        floatingStatus.textContent = 'Terdeteksi';
+      } else {
+        floatingIcon.className = 'fas fa-circle status-ok';
+        floatingStatus.textContent = 'Tidak Terdeteksi';
+      }
+      
+      // Update violation count
+      violationCountDisplay.textContent = `${violationCount}/${MAX_VIOLATIONS}`;
+      if (violationCount >= MAX_VIOLATIONS - 1) {
+        violationCountDisplay.style.color = '#ef4444';
+      } else if (violationCount > 0) {
+        violationCountDisplay.style.color = '#f59e0b';
+      } else {
+        violationCountDisplay.style.color = '#10b981';
+      }
+    }
+    
+    function handleSecurityViolation(type, message) {
+      violationCount++;
+      console.log(`Security violation: ${type} - ${message}`);
+      
+      if (violationCount >= MAX_VIOLATIONS) {
+        // Critical violation - end exam
+        handleCriticalViolation(message);
+      } else {
+        // Show warning
+        showFloatingWarning(`Peringatan ${violationCount}/${MAX_VIOLATIONS}: ${message}`);
+      }
+      
+      // Log violation (in real implementation, send to server)
+      logSecurityViolation(type, message);
+    }
+    
+    function handleCriticalViolation(message) {
+      violationMessage.textContent = `${message} Anda melebihi batas pelanggaran!`;
+      violationOverlay.classList.remove('hidden');
+      audioAlarm.play();
+      
+      // Start countdown
+      let seconds = 5;
+      violationTimer.textContent = seconds;
+      violationCountdown = setInterval(() => {
+        seconds--;
+        violationTimer.textContent = seconds;
+        
+        if (seconds <= 0) {
+          clearInterval(violationCountdown);
+          endExamDueToViolation();
+        }
+      }, 1000);
+    }
+    
+    function showFloatingWarning(message) {
+      if (isWarningActive) return;
+      
+      isWarningActive = true;
+      floatingWarning.querySelector('span').textContent = message;
+      floatingWarning.classList.remove('hidden');
+      
+      // Add critical class for high violation count
+      if (violationCount >= MAX_VIOLATIONS - 1) {
+        floatingWarning.classList.add('critical');
+      }
+      
+      audioAlarm.play();
+      
+      // Hide warning after duration
+      warningTimeout = setTimeout(() => {
+        floatingWarning.classList.add('hidden');
+        floatingWarning.classList.remove('critical');
+        isWarningActive = false;
+      }, WARNING_DURATION);
+    }
+    
+    function logSecurityViolation(type, message) {
+      const violationData = {
+        timestamp: new Date().toISOString(),
+        type: type,
+        message: message,
+        windowSize: `${window.innerWidth}x${window.innerHeight}`,
+        screenSize: `${screen.width}x${screen.height}`,
+        userAgent: navigator.userAgent,
+        violationCount: violationCount
+      };
+      
+      // In real implementation, send to server
+      console.log('Security Violation Logged:', violationData);
+      
+      // Store in localStorage for now
+      const violations = JSON.parse(localStorage.getItem('examViolations') || '[]');
+      violations.push(violationData);
+      localStorage.setItem('examViolations', JSON.stringify(violations));
+    }
+    
     // Start exam
     mulaiBtn.addEventListener('click', async () => {
       const kelas = kelasSelect.value;
@@ -717,7 +1152,7 @@
       // Show confirmation dialog
       const confirmed = await showConfirmation(
         'Konfirmasi Mulai Ujian',
-        `Anda akan memulai ujian ${mapelNames[mapel]} untuk kelas ${kelas}. Pastikan Anda siap sebelum memulai.`,
+        `Anda akan memulai ujian ${mapelNames[mapel]} untuk kelas ${kelas}. Sistem keamanan akan diaktifkan dan akan memantau aktivitas Anda. Pastikan Anda siap sebelum memulai.`,
         'Mulai Sekarang',
         'Batalkan'
       );
@@ -732,13 +1167,25 @@
         showAlert('Gagal masuk mode fullscreen. Lanjutkan manual.', 'warning');
       }
       
+      // Activate exam mode
+      isExamActive = true;
+      
       // Show exam frame
       examFrame.src = link;
       examTitle.textContent = `Ujian ${mapelNames[mapel]} - Kelas ${kelas}`;
       examFrameContainer.classList.remove('hidden');
       
+      // Show security monitor
+      securityMonitor.classList.remove('hidden');
+      
       // Hide main interface
-      document.querySelector('.card').classList.add('hidden');
+      mainCard.classList.add('hidden');
+      
+      // Initialize security state
+      securityState.isFullscreen = true;
+      securityState.isWindowFocused = true;
+      securityState.isSplitScreen = false;
+      securityState.isFloatingWindow = false;
       
       // Start exam timer
       examStartTime = new Date();
@@ -748,8 +1195,8 @@
       // Start screenshot interval
       startScreenshotInterval();
       
-      // Start split screen detection
-      startSplitScreenDetection();
+      // Start security monitoring
+      startSecurityMonitoring();
     });
     
     // Universal fullscreen request
@@ -791,6 +1238,18 @@
           window.scrollTo(0, 1);
         }
       }
+    }
+    
+    // Start security monitoring
+    function startSecurityMonitoring() {
+      // Perform initial security check
+      performSecurityCheck();
+      
+      // Set interval for continuous monitoring
+      securityCheckInterval = setInterval(performSecurityCheck, SECURITY_CHECK_INTERVAL);
+      
+      // Update security monitor display
+      updateSecurityMonitor();
     }
     
     // Update exam timer display
@@ -871,116 +1330,111 @@
       }
     });
     
-    // Start split screen detection
-    function startSplitScreenDetection() {
-      // Check initially
-      checkSplitScreen();
-      
-      // Set interval for periodic checks
-      splitScreenCheckInterval = setInterval(checkSplitScreen, 1000);
-    }
-    
-    // Check for split screen or other windows
-    function checkSplitScreen() {
-      // Method 1: Check window dimensions vs screen dimensions
-      const isSplitScreen = window.outerWidth < screen.availWidth * 0.9;
-      
-      // Method 2: Check if window is not in fullscreen
-      const isNotFullscreen = !document.fullscreenElement && 
-                             !document.webkitFullscreenElement && 
-                             !document.mozFullScreenElement && 
-                             !document.msFullscreenElement;
-      
-      // Method 3: Check if window is not focused (may indicate another window is active)
-      const isWindowNotFocused = !document.hasFocus();
-      
-      if (isSplitScreen || (isNotFullscreen && isWindowNotFocused)) {
-        handleViolation('Anda terdeteksi menggunakan mode layar terpisah atau aplikasi lain!');
-      }
-    }
-    
     // Exit exam button
     exitExamBtn.addEventListener('click', () => {
       showExitConfirmation();
     });
     
-    // Fullscreen and visibility change handlers
-    document.addEventListener('fullscreenchange', () => {
-      if (!document.fullscreenElement && 
-          !document.webkitFullscreenElement && 
-          !document.mozFullScreenElement && 
-          !document.msFullscreenElement) {
-        handleViolation('Anda keluar dari mode fullscreen!');
-      }
-    });
+    // Event Listeners for Security Monitoring
     
-    document.addEventListener('webkitfullscreenchange', () => {
-      if (!document.webkitFullscreenElement) {
-        handleViolation('Anda keluar dari mode fullscreen!');
-      }
-    });
+    // Fullscreen change handlers
+    document.addEventListener('fullscreenchange', () => performSecurityCheck());
+    document.addEventListener('webkitfullscreenchange', () => performSecurityCheck());
+    document.addEventListener('mozfullscreenchange', () => performSecurityCheck());
+    document.addEventListener('msfullscreenchange', () => performSecurityCheck());
     
-    document.addEventListener('mozfullscreenchange', () => {
-      if (!document.mozFullScreenElement) {
-        handleViolation('Anda keluar dari mode fullscreen!');
-      }
-    });
+    // Visibility change handler
+    document.addEventListener('visibilitychange', () => performSecurityCheck());
     
-    document.addEventListener('msfullscreenchange', () => {
-      if (!document.msFullscreenElement) {
-        handleViolation('Anda keluar dari mode fullscreen!');
-      }
-    });
-    
-    document.addEventListener('visibilitychange', () => {
-      if (document.hidden) {
-        handleViolation('Anda berpindah tab atau minimize browser!');
-      }
-    });
-    
-    // Window resize handler for split screen detection
+    // Window resize handler
     window.addEventListener('resize', () => {
-      if (examFrameContainer.classList.contains('hidden')) return;
-      checkSplitScreen();
+      if (isExamActive) {
+        setTimeout(performSecurityCheck, 100); // Small delay to allow resize to complete
+      }
     });
     
     // Window focus/blur handlers
-    window.addEventListener('blur', () => {
-      if (examFrameContainer.classList.contains('hidden')) return;
-      checkSplitScreen();
+    window.addEventListener('focus', () => performSecurityCheck());
+    window.addEventListener('blur', () => performSecurityCheck());
+    
+    // Mouse leave/enter handlers (additional security)
+    document.addEventListener('mouseleave', () => {
+      if (isExamActive) {
+        performSecurityCheck();
+      }
     });
     
-    // Violation handler
-    function handleViolation(message) {
-      // Show violation overlay
-      violationMessage.textContent = message;
-      violationOverlay.classList.remove('hidden');
-      audioAlarm.play();
+    // Keyboard shortcuts prevention
+    document.addEventListener('keydown', (e) => {
+      if (!isExamActive) return;
       
-      // Start countdown
-      let seconds = 5;
-      violationTimer.textContent = seconds;
-      violationCountdown = setInterval(() => {
-        seconds--;
-        violationTimer.textContent = seconds;
+      // Prevent common shortcuts that could be used to cheat
+      const forbiddenKeys = [
+        'F12', // Developer tools
+        'F11', // Fullscreen toggle
+        'Alt+Tab', // Alt+Tab
+        'Ctrl+Shift+I', // Dev tools
+        'Ctrl+Shift+J', // Console
+        'Ctrl+U', // View source
+        'Ctrl+Shift+C', // Inspect element
+        'Ctrl+T', // New tab
+        'Ctrl+N', // New window
+        'Ctrl+W', // Close tab
+        'Ctrl+R', // Refresh
+        'F5' // Refresh
+      ];
+      
+      const key = e.key;
+      const isCtrl = e.ctrlKey;
+      const isAlt = e.altKey;
+      const isShift = e.shiftKey;
+      
+      // Check for forbidden key combinations
+      if (
+        key === 'F12' ||
+        key === 'F11' ||
+        (isCtrl && isShift && (key === 'I' || key === 'J' || key === 'C')) ||
+        (isCtrl && (key === 'u' || key === 'U')) ||
+        (isCtrl && (key === 't' || key === 'T')) ||
+        (isCtrl && (key === 'n' || key === 'N')) ||
+        (isCtrl && (key === 'w' || key === 'W')) ||
+        (isCtrl && (key === 'r' || key === 'R')) ||
+        key === 'F5' ||
+        (isAlt && key === 'Tab')
+      ) {
+        e.preventDefault();
+        e.stopPropagation();
         
-        if (seconds <= 0) {
-          clearInterval(violationCountdown);
-          endExamDueToViolation();
-        }
-      }, 1000);
-    }
+        // Log as security violation
+        handleSecurityViolation('forbidden_shortcut', `Percobaan menggunakan shortcut terlarang: ${key}`);
+        
+        return false;
+      }
+    });
+    
+    // Context menu prevention (right-click)
+    document.addEventListener('contextmenu', (e) => {
+      if (isExamActive) {
+        e.preventDefault();
+        handleSecurityViolation('context_menu', 'Percobaan membuka context menu (klik kanan)');
+        return false;
+      }
+    });
     
     // End exam due to violation
     function endExamDueToViolation() {
       // Clear intervals
       clearInterval(screenshotInterval);
       clearInterval(examDurationInterval);
-      clearInterval(splitScreenCheckInterval);
+      clearInterval(securityCheckInterval);
       clearInterval(violationCountdown);
+      clearTimeout(warningTimeout);
       
-      // Hide violation overlay
+      // Hide warnings and overlays
       violationOverlay.classList.add('hidden');
+      floatingWarning.classList.add('hidden');
+      splitScreenIndicator.classList.add('hidden');
+      securityMonitor.classList.add('hidden');
       
       // Exit fullscreen
       if (document.exitFullscreen) {
@@ -996,10 +1450,63 @@
       // Remove fullscreen class
       document.body.classList.remove('fullscreen');
       
-      // Reload page
-      setTimeout(() => {
-        location.reload();
-      }, 1000);
+      // Reset exam interface
+      resetExamInterface();
+      
+      // Show main card again
+      mainCard.classList.remove('hidden');
+      
+      // Show alert
+      showAlert('Ujian dihentikan karena terdeteksi pelanggaran keamanan!', 'error');
+    }
+    
+    // Reset exam interface to initial state
+    function resetExamInterface() {
+      // Reset exam state
+      isExamActive = false;
+      
+      // Hide exam frame
+      examFrameContainer.classList.add('hidden');
+      examFrame.src = '';
+      
+      // Hide security elements
+      securityMonitor.classList.add('hidden');
+      splitScreenIndicator.classList.add('hidden');
+      
+      // Reset form selections
+      tokenInput.value = '';
+      kelasSelect.value = '';
+      mapelSelect.value = '';
+      currentMapel.textContent = '-';
+      
+      // Hide form sections
+      kelasContainer.classList.add('hidden');
+      mapelContainer.classList.add('hidden');
+      mulaiBtn.classList.add('hidden');
+      examInfo.classList.add('hidden');
+      
+      // Reset violation count
+      violationCount = 0;
+      
+      // Reset password field
+      tokenInput.setAttribute('type', 'password');
+      togglePassword.innerHTML = '<i class="fas fa-eye"></i>';
+      
+      // Reset warning
+      peringatan.textContent = '';
+      peringatan.classList.remove('text-green-500');
+      
+      // Reset security state
+      securityState = {
+        isFullscreen: false,
+        isWindowFocused: true,
+        isSplitScreen: false,
+        isFloatingWindow: false,
+        lastWindowWidth: window.innerWidth,
+        lastWindowHeight: window.innerHeight,
+        lastScreenWidth: screen.width,
+        lastScreenHeight: screen.height
+      };
     }
     
     // UI Helper functions
@@ -1040,7 +1547,7 @@
     async function showExitConfirmation() {
       const confirmed = await showConfirmation(
         'Keluar dari Ujian?',
-        'Anda yakin ingin keluar dari ujian? Semua progress akan hilang.',
+        'Anda yakin ingin keluar dari ujian? Semua progress akan hilang dan pelanggaran keamanan akan dicatat.',
         'Ya, Keluar',
         'Lanjutkan Ujian'
       );
@@ -1049,7 +1556,8 @@
         // Clear intervals
         clearInterval(screenshotInterval);
         clearInterval(examDurationInterval);
-        clearInterval(splitScreenCheckInterval);
+        clearInterval(securityCheckInterval);
+        clearTimeout(warningTimeout);
         
         // Exit fullscreen
         if (document.exitFullscreen) {
@@ -1065,15 +1573,419 @@
         // Remove fullscreen class
         document.body.classList.remove('fullscreen');
         
-        // Reload page
-        location.reload();
+        // Reset exam interface
+        resetExamInterface();
+        
+        // Show main card again
+        mainCard.classList.remove('hidden');
       }
     }
     
+    // Additional Security Features
+    
+    // Detect screen recording or screen sharing
+    function detectScreenRecording() {
+      // Check if screen capture is active (limited browser support)
+      if (navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia) {
+        // This is a basic check - in practice, you'd need more sophisticated detection
+        return false; // Placeholder
+      }
+      return false;
+    }
+    
+    // Detect virtual machines or remote desktop
+    function detectVirtualEnvironment() {
+      const userAgent = navigator.userAgent.toLowerCase();
+      const platform = navigator.platform.toLowerCase();
+      
+      // Common VM/RDP indicators
+      const vmIndicators = [
+        'virtualbox', 'vmware', 'qemu', 'parallels', 'virtual',
+        'rdp', 'remote', 'citrix', 'teamviewer'
+      ];
+      
+      for (const indicator of vmIndicators) {
+        if (userAgent.includes(indicator) || platform.includes(indicator)) {
+          return true;
+        }
+      }
+      
+      // Check for unusual screen dimensions that might indicate VM
+      const unusualDimensions = 
+        screen.width === 1024 && screen.height === 768 || // Common VM default
+        screen.width === 800 && screen.height === 600 ||   // Old VM default
+        screen.colorDepth < 24; // Limited color depth might indicate VM
+      
+      return unusualDimensions;
+    }
+    
+    // Enhanced browser tab detection
+    function detectTabSwitching() {
+      let tabSwitchCount = 0;
+      let lastVisibilityChange = Date.now();
+      
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+          tabSwitchCount++;
+          const timeSinceLastSwitch = Date.now() - lastVisibilityChange;
+          
+          if (timeSinceLastSwitch > 1000) { // Only count if more than 1 second apart
+            logSecurityViolation('tab_switch', `Tab switching detected (count: ${tabSwitchCount})`);
+          }
+          
+          lastVisibilityChange = Date.now();
+        }
+      });
+      
+      return tabSwitchCount;
+    }
+    
+    // Device orientation change detection (for mobile cheating prevention)
+    function setupOrientationDetection() {
+      if (screen.orientation) {
+        let lastOrientation = screen.orientation.angle;
+        
+        screen.orientation.addEventListener('change', () => {
+          if (isExamActive) {
+            const currentOrientation = screen.orientation.angle;
+            
+            if (Math.abs(currentOrientation - lastOrientation) > 45) {
+              handleSecurityViolation('orientation_change', 
+                `Perubahan orientasi layar terdeteksi: ${lastOrientation}° → ${currentOrientation}°`);
+            }
+            
+            lastOrientation = currentOrientation;
+          }
+        });
+      }
+    }
+    
+    // Network connectivity monitoring
+    function setupNetworkMonitoring() {
+      let isOnline = navigator.onLine;
+      
+      window.addEventListener('online', () => {
+        if (isExamActive && !isOnline) {
+          logSecurityViolation('network_reconnect', 'Koneksi internet dipulihkan');
+        }
+        isOnline = true;
+      });
+      
+      window.addEventListener('offline', () => {
+        if (isExamActive) {
+          handleSecurityViolation('network_disconnect', 'Koneksi internet terputus');
+        }
+        isOnline = false;
+      });
+    }
+    
+    // Battery level monitoring (unusual patterns might indicate cheating tools)
+    function setupBatteryMonitoring() {
+      if ('getBattery' in navigator) {
+        navigator.getBattery().then(battery => {
+          let lastBatteryLevel = battery.level;
+          
+          battery.addEventListener('levelchange', () => {
+            if (isExamActive) {
+              const currentLevel = battery.level;
+              const levelDrop = lastBatteryLevel - currentLevel;
+              
+              // Unusual battery drain might indicate screen recording or other tools
+              if (levelDrop > 0.1 && levelDrop < 0.9) { // More than 10% drop in short time
+                logSecurityViolation('unusual_battery_drain', 
+                  `Penurunan baterai tidak normal: ${(levelDrop * 100).toFixed(1)}%`);
+              }
+              
+              lastBatteryLevel = currentLevel;
+            }
+          });
+        });
+      }
+    }
+    
+    // Memory usage monitoring
+    function monitorMemoryUsage() {
+      if ('memory' in performance) {
+        const initialMemory = performance.memory.usedJSHeapSize;
+        
+        setInterval(() => {
+          if (isExamActive && performance.memory) {
+            const currentMemory = performance.memory.usedJSHeapSize;
+            const memoryIncrease = currentMemory - initialMemory;
+            
+            // Unusual memory usage might indicate other applications
+            if (memoryIncrease > 50 * 1024 * 1024) { // More than 50MB increase
+              logSecurityViolation('high_memory_usage', 
+                `Penggunaan memori tinggi: ${(memoryIncrease / 1024 / 1024).toFixed(1)}MB`);
+            }
+          }
+        }, 30000); // Check every 30 seconds
+      }
+    }
+    
+    // Advanced window detection
+    function detectWindowManipulation() {
+      let windowHistory = [];
+      
+      function recordWindowState() {
+        const state = {
+          width: window.innerWidth,
+          height: window.innerHeight,
+          outerWidth: window.outerWidth,
+          outerHeight: window.outerHeight,
+          screenX: window.screenX,
+          screenY: window.screenY,
+          timestamp: Date.now()
+        };
+        
+        windowHistory.push(state);
+        
+        // Keep only last 10 records
+        if (windowHistory.length > 10) {
+          windowHistory.shift();
+        }
+        
+        // Analyze for suspicious patterns
+        if (windowHistory.length >= 3) {
+          const recent = windowHistory.slice(-3);
+          
+          // Check for rapid size changes (possible automation)
+          const rapidChanges = recent.every((state, index) => {
+            if (index === 0) return true;
+            const prevState = recent[index - 1];
+            const timeDiff = state.timestamp - prevState.timestamp;
+            const sizeDiff = Math.abs(state.width - prevState.width) + Math.abs(state.height - prevState.height);
+            
+            return timeDiff < 1000 && sizeDiff > 100; // Fast changes
+          });
+          
+          if (rapidChanges) {
+            handleSecurityViolation('rapid_window_changes', 'Perubahan ukuran jendela yang cepat terdeteksi');
+          }
+        }
+      }
+      
+      // Record window state changes
+      window.addEventListener('resize', recordWindowState);
+      window.addEventListener('move', recordWindowState);
+    }
+    
+    // Initialize all security features
+    function initializeSecurityFeatures() {
+      setupOrientationDetection();
+      setupNetworkMonitoring();
+      setupBatteryMonitoring();
+      monitorMemoryUsage();
+      detectWindowManipulation();
+      
+      // Check for virtual environment
+      if (detectVirtualEnvironment()) {
+        logSecurityViolation('virtual_environment', 'Lingkungan virtual atau remote desktop terdeteksi');
+      }
+      
+      // Set up tab switching detection
+      detectTabSwitching();
+    }
+    
+    // Enhanced screenshot with metadata
+    function takeEnhancedScreenshot() {
+      const metadata = {
+        timestamp: new Date().toISOString(),
+        windowSize: `${window.innerWidth}x${window.innerHeight}`,
+        screenSize: `${screen.width}x${screen.height}`,
+        colorDepth: screen.colorDepth,
+        pixelRatio: window.devicePixelRatio,
+        userAgent: navigator.userAgent,
+        language: navigator.language,
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        examDuration: examStartTime ? Math.floor((Date.now() - examStartTime.getTime()) / 1000) : 0,
+        violationCount: violationCount,
+        securityState: { ...securityState }
+      };
+      
+      // Take regular screenshot
+      takeScreenshot();
+      
+      // Log metadata
+      console.log('Screenshot metadata:', metadata);
+      
+      // Store metadata (in real implementation, send to server)
+      const screenshots = JSON.parse(localStorage.getItem('examScreenshots') || '[]');
+      screenshots.push(metadata);
+      localStorage.setItem('examScreenshots', JSON.stringify(screenshots));
+    }
+    
+    // Replace regular screenshot function with enhanced version
+    function startScreenshotInterval() {
+      // Take initial enhanced screenshot
+      takeEnhancedScreenshot();
+      
+      // Set interval for periodic enhanced screenshots
+      screenshotInterval = setInterval(takeEnhancedScreenshot, SCREENSHOT_INTERVAL);
+    }
+    
     // Clean up on page unload
-    window.addEventListener('beforeunload', () => {
+    window.addEventListener('beforeunload', (e) => {
       stopQRScanner();
+      
+      if (isExamActive) {
+        // Log exam termination
+        logSecurityViolation('exam_terminated', 'Ujian dihentikan dengan menutup halaman');
+        
+        // Show warning message
+        e.preventDefault();
+        e.returnValue = 'Anda sedang dalam ujian. Menutup halaman akan mengakhiri ujian dan dicatat sebagai pelanggaran.';
+        return e.returnValue;
+      }
     });
+    
+    // Initialize security features when page loads
+    document.addEventListener('DOMContentLoaded', () => {
+      initializeSecurityFeatures();
+    });
+    
+    // Enhanced page visibility detection
+    let pageHideCount = 0;
+    let totalHiddenTime = 0;
+    let hideStartTime = null;
+    
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        pageHideCount++;
+        hideStartTime = Date.now();
+      } else if (hideStartTime) {
+        const hiddenDuration = Date.now() - hideStartTime;
+        totalHiddenTime += hiddenDuration;
+        
+        if (isExamActive && hiddenDuration > 5000) { // Hidden for more than 5 seconds
+          handleSecurityViolation('prolonged_tab_switch', 
+            `Tab disembunyikan selama ${Math.round(hiddenDuration/1000)} detik (total: ${pageHideCount} kali)`);
+        }
+        
+        hideStartTime = null;
+      }
+    });
+    
+    // Prevent text selection and copy-paste
+    document.addEventListener('selectstart', (e) => {
+      if (isExamActive) {
+        e.preventDefault();
+        return false;
+      }
+    });
+    
+    document.addEventListener('copy', (e) => {
+      if (isExamActive) {
+        e.preventDefault();
+        handleSecurityViolation('copy_attempt', 'Percobaan menyalin teks terdeteksi');
+        return false;
+      }
+    });
+    
+    document.addEventListener('paste', (e) => {
+      if (isExamActive) {
+        e.preventDefault();
+        handleSecurityViolation('paste_attempt', 'Percobaan menempel teks terdeteksi');
+        return false;
+      }
+    });
+    
+    // Prevent drag and drop
+    document.addEventListener('dragstart', (e) => {
+      if (isExamActive) {
+        e.preventDefault();
+        return false;
+      }
+    });
+    
+    document.addEventListener('drop', (e) => {
+      if (isExamActive) {
+        e.preventDefault();
+        handleSecurityViolation('drop_attempt', 'Percobaan drag & drop terdeteksi');
+        return false;
+      }
+    });
+    
+    // Prevent print screen and other system shortcuts
+    document.addEventListener('keyup', (e) => {
+      if (isExamActive && e.key === 'PrintScreen') {
+        handleSecurityViolation('print_screen', 'Percobaan Print Screen terdeteksi');
+      }
+    });
+    
+    // Mouse movement tracking (detect if user is not actively engaging)
+    let lastMouseMove = Date.now();
+    let mouseIdleWarningShown = false;
+    
+    document.addEventListener('mousemove', () => {
+      lastMouseMove = Date.now();
+      mouseIdleWarningShown = false;
+    });
+    
+    // Check for mouse inactivity
+    setInterval(() => {
+      if (isExamActive) {
+        const idleTime = Date.now() - lastMouseMove;
+        
+        if (idleTime > 300000 && !mouseIdleWarningShown) { // 5 minutes idle
+          logSecurityViolation('mouse_idle', `Mouse tidak aktif selama ${Math.round(idleTime/1000)} detik`);
+          mouseIdleWarningShown = true;
+        }
+      }
+    }, 60000); // Check every minute
+    
+    // Focus trap to prevent tabbing out of exam
+    function trapFocus(element) {
+      const focusableElements = element.querySelectorAll(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      );
+      
+      const firstElement = focusableElements[0];
+      const lastElement = focusableElements[focusableElements.length - 1];
+      
+      element.addEventListener('keydown', (e) => {
+        if (e.key === 'Tab') {
+          if (e.shiftKey) {
+            if (document.activeElement === firstElement) {
+              e.preventDefault();
+              lastElement.focus();
+            }
+          } else {
+            if (document.activeElement === lastElement) {
+              e.preventDefault();
+              firstElement.focus();
+            }
+          }
+        }
+      });
+    }
+    
+    // Apply focus trap when exam starts
+    function applyFocusTrap() {
+      if (isExamActive) {
+        trapFocus(examFrameContainer);
+      }
+    }
+    
+    // Call applyFocusTrap when exam starts (add this to the mulaiBtn click handler)
+    // This would be added to the existing start exam function
+    
+    console.log('Enhanced Exam Security System Loaded');
+    console.log('Security Features:');
+    console.log('- Floating window detection');
+    console.log('- Split screen detection');
+    console.log('- Advanced multitasking detection');
+    console.log('- Keyboard shortcut prevention');
+    console.log('- Context menu blocking');
+    console.log('- Copy/paste prevention');
+    console.log('- Virtual environment detection');
+    console.log('- Network monitoring');
+    console.log('- Battery usage monitoring');
+    console.log('- Memory usage monitoring');
+    console.log('- Window manipulation detection');
+    console.log('- Enhanced screenshot with metadata');
+    console.log('- Mouse activity tracking');
+    console.log('- Focus trapping');
   </script>
 </body>
 </html>
