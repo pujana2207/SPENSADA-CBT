@@ -8,6 +8,8 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
     
@@ -15,6 +17,7 @@
       font-family: 'Poppins', sans-serif;
       background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
       min-height: 100vh;
+      -webkit-tap-highlight-color: transparent;
     }
     
     .card {
@@ -198,6 +201,36 @@
       color: #ef4444;
     }
     
+    /* Fullscreen styles */
+    :fullscreen, ::-webkit-full-screen {
+      background-color: white;
+    }
+    
+    /* iOS specific styles */
+    @supports (-webkit-touch-callout: none) {
+      body {
+        /* Prevent overscroll bounce on iOS */
+        overscroll-behavior-y: none;
+        -webkit-overflow-scrolling: touch;
+      }
+      
+      /* Fix for Safari viewport units */
+      .full-height {
+        height: 100vh;
+        height: -webkit-fill-available;
+      }
+    }
+    
+    /* Android Chrome address bar hiding */
+    .fullscreen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 9999;
+    }
+    
     @media (max-width: 640px) {
       .mobile-padding {
         padding: 1rem;
@@ -222,6 +255,26 @@
       .violation-timer {
         font-size: 1.5rem;
       }
+      
+      /* Mobile fullscreen adjustments */
+      #examFrameContainer {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+      }
+      
+      .exam-controls {
+        bottom: 10px;
+        right: 10px;
+      }
+      
+      .exam-control-btn {
+        width: 45px;
+        height: 45px;
+        font-size: 0.9rem;
+      }
     }
   </style>
 </head>
@@ -234,7 +287,7 @@
         <div class="w-20 h-20 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
           <img src="https://i.ibb.co.com/3YjdDh2N/logo-sekolah-FINAL.png" alt="Logo Sekolah" class="h-14 w-14 object-contain">
         </div>
-        <h1 class="text-2xl font-bold text-gray-800 mobile-text">Sistem Ujian Digital SMP Negeri 1 Sukasada</h1>
+        <h1 class="text-2xl font-bold text-gray-800 mobile-text">Sistem Ujian Digital</h1>
         <p class="text-gray-600 mt-2">Scan QR Code atau masukkan token untuk memulai ujian</p>
       </div>
       
@@ -377,7 +430,7 @@
   </div>
   
   <!-- Exam Frame (Hidden Initially) -->
-  <div id="examFrameContainer" class="hidden fixed inset-0 bg-white z-50 flex flex-col">
+  <div id="examFrameContainer" class="hidden fixed inset-0 bg-white z-50 flex flex-col full-height">
     <div class="bg-indigo-600 text-white p-4 flex justify-between items-center">
       <div>
         <span id="examTitle" class="font-medium"></span>
@@ -387,7 +440,7 @@
         <i class="fas fa-times text-xl"></i>
       </button>
     </div>
-    <iframe id="examFrame" class="flex-grow" frameborder="0"></iframe>
+    <iframe id="examFrame" class="flex-grow w-full" frameborder="0"></iframe>
     
     <!-- Exam Controls -->
     <div class="exam-controls">
@@ -672,8 +725,8 @@
       if (!confirmed) return;
       
       try {
-        // Attempt fullscreen
-        await document.documentElement.requestFullscreen();
+        // Attempt fullscreen with different methods for different browsers
+        await requestFullscreen();
       } catch (err) {
         console.error('Fullscreen error:', err);
         showAlert('Gagal masuk mode fullscreen. Lanjutkan manual.', 'warning');
@@ -698,6 +751,47 @@
       // Start split screen detection
       startSplitScreenDetection();
     });
+    
+    // Universal fullscreen request
+    async function requestFullscreen() {
+      const element = document.documentElement;
+      
+      // Standard method
+      if (element.requestFullscreen) {
+        await element.requestFullscreen();
+      } 
+      // WebKit (Safari)
+      else if (element.webkitRequestFullscreen) {
+        await element.webkitRequestFullscreen();
+      } 
+      // Firefox
+      else if (element.mozRequestFullScreen) {
+        await element.mozRequestFullScreen();
+      } 
+      // MS (Edge/IE)
+      else if (element.msRequestFullscreen) {
+        await element.msRequestFullscreen();
+      }
+      // iOS specific (not true fullscreen but hides UI)
+      else if (window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches) {
+        // Already in standalone mode
+      } 
+      // Fallback for browsers that don't support fullscreen
+      else {
+        // Add class to simulate fullscreen
+        document.body.classList.add('fullscreen');
+        
+        // For iOS, scroll to top and hide address bar
+        if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+          window.scrollTo(0, 1);
+        }
+        
+        // For Android Chrome, hide address bar
+        if (/Android/i.test(navigator.userAgent)) {
+          window.scrollTo(0, 1);
+        }
+      }
+    }
     
     // Update exam timer display
     function updateExamTimer() {
@@ -771,11 +865,7 @@
     // Fullscreen button
     fullscreenBtn.addEventListener('click', async () => {
       try {
-        if (!document.fullscreenElement) {
-          await document.documentElement.requestFullscreen();
-        } else {
-          await document.exitFullscreen();
-        }
+        await requestFullscreen();
       } catch (err) {
         console.error('Fullscreen error:', err);
       }
@@ -796,7 +886,10 @@
       const isSplitScreen = window.outerWidth < screen.availWidth * 0.9;
       
       // Method 2: Check if window is not in fullscreen
-      const isNotFullscreen = !document.fullscreenElement;
+      const isNotFullscreen = !document.fullscreenElement && 
+                             !document.webkitFullscreenElement && 
+                             !document.mozFullScreenElement && 
+                             !document.msFullscreenElement;
       
       // Method 3: Check if window is not focused (may indicate another window is active)
       const isWindowNotFocused = !document.hasFocus();
@@ -813,7 +906,28 @@
     
     // Fullscreen and visibility change handlers
     document.addEventListener('fullscreenchange', () => {
-      if (!document.fullscreenElement) {
+      if (!document.fullscreenElement && 
+          !document.webkitFullscreenElement && 
+          !document.mozFullScreenElement && 
+          !document.msFullscreenElement) {
+        handleViolation('Anda keluar dari mode fullscreen!');
+      }
+    });
+    
+    document.addEventListener('webkitfullscreenchange', () => {
+      if (!document.webkitFullscreenElement) {
+        handleViolation('Anda keluar dari mode fullscreen!');
+      }
+    });
+    
+    document.addEventListener('mozfullscreenchange', () => {
+      if (!document.mozFullScreenElement) {
+        handleViolation('Anda keluar dari mode fullscreen!');
+      }
+    });
+    
+    document.addEventListener('msfullscreenchange', () => {
+      if (!document.msFullscreenElement) {
         handleViolation('Anda keluar dari mode fullscreen!');
       }
     });
@@ -869,7 +983,18 @@
       violationOverlay.classList.add('hidden');
       
       // Exit fullscreen
-      document.exitFullscreen();
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      } else if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen();
+      } else if (document.mozCancelFullScreen) {
+        document.mozCancelFullScreen();
+      } else if (document.msExitFullscreen) {
+        document.msExitFullscreen();
+      }
+      
+      // Remove fullscreen class
+      document.body.classList.remove('fullscreen');
       
       // Reload page
       setTimeout(() => {
@@ -927,7 +1052,18 @@
         clearInterval(splitScreenCheckInterval);
         
         // Exit fullscreen
-        document.exitFullscreen();
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) {
+          document.webkitExitFullscreen();
+        } else if (document.mozCancelFullScreen) {
+          document.mozCancelFullScreen();
+        } else if (document.msExitFullscreen) {
+          document.msExitFullscreen();
+        }
+        
+        // Remove fullscreen class
+        document.body.classList.remove('fullscreen');
         
         // Reload page
         location.reload();
