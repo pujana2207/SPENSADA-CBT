@@ -1,878 +1,943 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Ujian Online - Sistem Keamanan Tinggi</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ujian Online - Sistem Ujian Digital</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+    
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
       min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 1rem;
     }
-
-    .container {
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(10px);
-      border-radius: 20px;
-      padding: 2rem;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-      width: 100%;
-      max-width: 450px;
-      text-align: center;
-      transition: all 0.4s ease;
-    }
-
-    .container.exam-mode {
-      max-width: 100%;
-      height: 100vh;
-      border-radius: 0;
-      padding: 0;
-    }
-
-    .logo {
-      width: 80px;
-      height: 80px;
-      background: linear-gradient(45deg, #4CAF50, #45a049);
-      border-radius: 50%;
-      margin: 0 auto 1.5rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 2rem;
-      color: white;
-      animation: pulse 2s infinite;
-    }
-
-    @keyframes pulse {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.05); }
-      100% { transform: scale(1); }
-    }
-
-    h1 {
-      color: #333;
-      margin-bottom: 0.5rem;
-      font-size: 1.8rem;
-      font-weight: 700;
-    }
-
-    .subtitle {
-      color: #666;
-      margin-bottom: 2rem;
-      font-size: 1rem;
-      line-height: 1.5;
-    }
-
-    .input-group {
-      position: relative;
-      margin-bottom: 1.5rem;
-    }
-
-    input {
-      width: 100%;
-      padding: 1rem 1.2rem;
-      font-size: 1.1rem;
-      border: 2px solid #e0e0e0;
+    
+    .card {
+      backdrop-filter: blur(16px) saturate(180%);
+      -webkit-backdrop-filter: blur(16px) saturate(180%);
+      background-color: rgba(255, 255, 255, 0.85);
       border-radius: 12px;
-      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(209, 213, 219, 0.3);
+      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.1);
       transition: all 0.3s ease;
-      outline: none;
     }
-
-    input:focus {
-      border-color: #667eea;
-      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.15);
     }
-
-    input.valid {
-      border-color: #4CAF50;
-      background: rgba(76, 175, 80, 0.05);
-    }
-
-    input.invalid {
-      border-color: #f44336;
-      background: rgba(244, 67, 54, 0.05);
-      animation: shake 0.5s ease-in-out;
-    }
-
-    @keyframes shake {
-      0%, 100% { transform: translateX(0); }
-      25% { transform: translateX(-5px); }
-      75% { transform: translateX(5px); }
-    }
-
-    button {
-      width: 100%;
-      padding: 1rem 1.5rem;
-      font-size: 1.1rem;
-      font-weight: 600;
-      border: none;
-      border-radius: 12px;
-      background: linear-gradient(45deg, #667eea, #764ba2);
-      color: white;
-      cursor: pointer;
+    
+    .input-field {
       transition: all 0.3s ease;
-      position: relative;
-      overflow: hidden;
+      border: 2px solid #e2e8f0;
     }
-
-    button:disabled {
-      background: #ccc;
-      cursor: not-allowed;
-      opacity: 0.6;
+    
+    .input-field:focus {
+      border-color: #4f46e5;
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
     }
-
-    button:not(:disabled):hover {
+    
+    .btn-primary {
+      background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+      transition: all 0.3s ease;
+    }
+    
+    .btn-primary:hover {
       transform: translateY(-2px);
-      box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+      box-shadow: 0 5px 15px -5px rgba(79, 70, 229, 0.6);
     }
-
-    button:not(:disabled):active {
+    
+    .btn-primary:active {
       transform: translateY(0);
     }
-
-    .button-text {
-      position: relative;
-      z-index: 2;
-    }
-
-    .loading {
-      display: none;
-      width: 20px;
-      height: 20px;
-      border: 2px solid #ffffff40;
-      border-top: 2px solid #ffffff;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-      margin-right: 10px;
-    }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    #peringatan {
-      margin-top: 1rem;
-      padding: 0.8rem;
-      border-radius: 8px;
-      font-weight: 500;
+    
+    .btn-secondary {
+      background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
       transition: all 0.3s ease;
-      opacity: 0;
-      transform: translateY(-10px);
     }
-
-    #peringatan.show {
-      opacity: 1;
-      transform: translateY(0);
+    
+    .btn-secondary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px -5px rgba(59, 130, 246, 0.6);
     }
-
-    #peringatan.error {
-      background: rgba(244, 67, 54, 0.1);
-      color: #f44336;
-      border: 1px solid rgba(244, 67, 54, 0.3);
+    
+    .select-field {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+      background-position: right 0.5rem center;
+      background-repeat: no-repeat;
+      background-size: 1.5em 1.5em;
     }
-
-    #peringatan.success {
-      background: rgba(76, 175, 80, 0.1);
-      color: #4CAF50;
-      border: 1px solid rgba(76, 175, 80, 0.3);
-    }
-
-    #peringatan.warning {
-      background: rgba(255, 193, 7, 0.1);
-      color: #ff9800;
-      border: 1px solid rgba(255, 193, 7, 0.3);
-    }
-
-    .security-info {
-      background: rgba(33, 150, 243, 0.1);
-      border: 1px solid rgba(33, 150, 243, 0.3);
-      border-radius: 8px;
-      padding: 1rem;
-      margin-top: 1.5rem;
-      color: #1976d2;
-      font-size: 0.9rem;
-    }
-
-    .security-info h3 {
-      margin-bottom: 0.5rem;
-      font-size: 1rem;
-    }
-
-    .security-info ul {
-      text-align: left;
-      padding-left: 1.5rem;
-    }
-
-    .security-info li {
-      margin-bottom: 0.3rem;
-    }
-
-    iframe {
+    
+    #qrScanner {
       width: 100%;
-      height: 100vh;
-      border: none;
-      display: none;
-    }
-
-    .fullscreen-controls {
-      position: fixed;
-      top: 10px;
-      right: 10px;
-      z-index: 1000;
-      display: none;
-    }
-
-    .control-btn {
-      background: rgba(0, 0, 0, 0.7);
-      color: white;
-      border: none;
-      padding: 8px 12px;
-      border-radius: 6px;
-      margin-left: 5px;
-      cursor: pointer;
-      font-size: 0.8rem;
-    }
-
-    .timer {
-      position: fixed;
-      top: 10px;
-      left: 10px;
-      background: rgba(0, 0, 0, 0.8);
-      color: white;
-      padding: 8px 16px;
-      border-radius: 20px;
-      font-weight: bold;
-      display: none;
-      z-index: 1000;
-    }
-
-    .mapel-container {
-      display: none;
-      margin-top: 1.5rem;
-    }
-
-    .mapel-container.show {
-      display: block;
-      animation: slideIn 0.4s ease-out;
-    }
-
-    @keyframes slideIn {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .mapel-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-      gap: 12px;
-      margin-bottom: 1.5rem;
-    }
-
-    .mapel-card {
-      background: rgba(255, 255, 255, 0.9);
-      border: 2px solid #e0e0e0;
-      border-radius: 12px;
-      padding: 1rem 0.8rem;
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.3s ease;
+      max-width: 400px;
+      height: 300px;
+      margin: 0 auto;
+      background: black;
       position: relative;
+      border-radius: 8px;
       overflow: hidden;
     }
-
-    .mapel-card:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.15);
-      border-color: #667eea;
+    
+    #qrScanner video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
     }
-
-    .mapel-card.selected {
-      background: linear-gradient(45deg, #667eea, #764ba2);
-      color: white;
-      border-color: #667eea;
-      box-shadow: 0 5px 20px rgba(102, 126, 234, 0.3);
-    }
-
-    .mapel-icon {
-      font-size: 2rem;
-      margin-bottom: 0.5rem;
-      display: block;
-    }
-
-    .mapel-name {
-      font-weight: 600;
-      font-size: 0.9rem;
-      margin-bottom: 0.3rem;
-    }
-
-    .mapel-info {
-      font-size: 0.75rem;
-      opacity: 0.8;
-    }
-
-    .mapel-selected-info {
-      background: rgba(76, 175, 80, 0.1);
-      border: 1px solid rgba(76, 175, 80, 0.3);
-      border-radius: 8px;
-      padding: 1rem;
-      margin-top: 1rem;
-      color: #2e7d32;
-      text-align: left;
-    }
-
-    .mapel-selected-info h4 {
-      margin-bottom: 0.5rem;
+    
+    .scanner-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.5);
     }
-
-    .mapel-selected-info ul {
-      padding-left: 1.5rem;
-      margin: 0;
+    
+    .scanner-frame {
+      width: 70%;
+      height: 70%;
+      border: 3px solid #4f46e5;
+      border-radius: 8px;
+      position: relative;
+      box-shadow: 0 0 0 1000px rgba(0, 0, 0, 0.5);
     }
-
-    .mapel-selected-info li {
-      margin-bottom: 0.2rem;
+    
+    .scanner-line {
+      position: absolute;
+      width: 100%;
+      height: 4px;
+      background: linear-gradient(90deg, transparent, #4f46e5, transparent);
+      animation: scan 2s linear infinite;
     }
-    @media (max-width: 480px) {
-      .container {
-        padding: 1.5rem;
-        margin: 0.5rem;
+    
+    @keyframes scan {
+      0% { top: 0; opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { top: 100%; opacity: 0; }
+    }
+    
+    #screenshotCanvas {
+      display: none;
+    }
+    
+    .exam-controls {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 1000;
+      display: flex;
+      gap: 10px;
+    }
+    
+    .exam-control-btn {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: #4f46e5;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .exam-control-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+    }
+    
+    .exam-control-btn:active {
+      transform: translateY(0);
+    }
+    
+    .violation-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.9);
+      z-index: 2000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      text-align: center;
+      padding: 20px;
+    }
+    
+    .violation-icon {
+      font-size: 5rem;
+      color: #ef4444;
+      margin-bottom: 2rem;
+    }
+    
+    .violation-message {
+      font-size: 1.5rem;
+      margin-bottom: 2rem;
+      max-width: 600px;
+    }
+    
+    .violation-timer {
+      font-size: 2rem;
+      font-weight: bold;
+      color: #ef4444;
+    }
+    
+    @media (max-width: 640px) {
+      .mobile-padding {
+        padding: 1rem;
       }
-
-      h1 {
+      
+      .mobile-text {
         font-size: 1.5rem;
       }
-
-      .subtitle {
-        font-size: 0.9rem;
+      
+      .input-field, .select-field {
+        padding: 0.75rem;
       }
-
-      input, button {
-        font-size: 1rem;
-        padding: 0.9rem 1rem;
+      
+      #qrScanner {
+        height: 250px;
       }
-
-      .logo {
-        width: 60px;
-        height: 60px;
+      
+      .violation-message {
+        font-size: 1.2rem;
+      }
+      
+      .violation-timer {
         font-size: 1.5rem;
-      }
-    }
-
-    /* Dark mode support */
-    @media (prefers-color-scheme: dark) {
-      .container {
-        background: rgba(30, 30, 30, 0.95);
-        color: #fff;
-      }
-
-      h1 {
-        color: #fff;
-      }
-
-      .subtitle {
-        color: #ccc;
-      }
-
-      input {
-        background: rgba(50, 50, 50, 0.9);
-        color: #fff;
-        border-color: #555;
       }
     }
   </style>
 </head>
-<body>
-  <div class="container" id="mainContainer">
-    <div class="logo">🎓</div>
-    <h1>Ujian Online</h1>
-    <p class="subtitle">Sistem Keamanan Tinggi - Masukkan token ujian untuk memulai</p>
-    
-    <div class="input-group">
-      <input 
-        type="password" 
-        id="tokenInput" 
-        placeholder="Masukkan token ujian"
-        autocomplete="off"
-        maxlength="20"
-      />
+<body class="flex items-center justify-center p-4 mobile-padding">
+  <div class="w-full max-w-md mx-auto">
+    <!-- Main Card -->
+    <div class="card p-8 mb-6">
+      <!-- Logo/Header -->
+      <div class="text-center mb-8">
+        <div class="w-20 h-20 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <img src="https://i.ibb.co.com/3YjdDh2N/logo-sekolah-FINAL.png" alt="Logo Sekolah" class="h-14 w-14 object-contain">
+        </div>
+        <h1 class="text-2xl font-bold text-gray-800 mobile-text">Sistem Ujian Digital SMP Negeri 1 Sukasada</h1>
+        <p class="text-gray-600 mt-2">Scan QR Code atau masukkan token untuk memulai ujian</p>
+      </div>
+      
+      <!-- QR Scanner Button -->
+      <button 
+        id="scanQRBtn"
+        class="w-full btn-secondary text-white py-3 px-4 rounded-lg font-medium mb-4"
+      >
+        <i class="fas fa-qrcode mr-2"></i> Scan QR Code
+      </button>
+      
+      <div class="flex items-center my-4">
+        <div class="flex-grow border-t border-gray-300"></div>
+        <span class="mx-4 text-gray-500">atau</span>
+        <div class="flex-grow border-t border-gray-300"></div>
+      </div>
+      
+      <!-- Token Input -->
+      <div class="mb-6">
+        <div class="relative">
+          <input 
+            type="password" 
+            id="tokenInput" 
+            placeholder="Masukkan token ujian" 
+            autocomplete="off"
+            class="w-full px-4 py-3 rounded-lg input-field focus:outline-none"
+          >
+          <button 
+            id="togglePassword" 
+            class="absolute right-3 top-3 text-gray-500 hover:text-gray-700"
+            type="button"
+          >
+            <i class="fas fa-eye"></i>
+          </button>
+        </div>
+        <div id="peringatan" class="text-red-500 text-sm mt-2 flex items-center">
+          <i class="fas fa-exclamation-circle mr-1"></i>
+          <span></span>
+        </div>
+      </div>
+      
+      <!-- QR Scanner Modal -->
+      <div id="qrScannerModal" class="hidden fixed inset-0 bg-black bg-opacity-90 z-50 flex flex-col items-center justify-center p-4">
+        <div class="w-full max-w-md bg-white rounded-lg overflow-hidden">
+          <div class="bg-indigo-600 text-white p-4 flex justify-between items-center">
+            <h2 class="text-lg font-medium">Scan QR Code Token</h2>
+            <button id="closeScannerBtn" class="text-white hover:text-indigo-200">
+              <i class="fas fa-times text-xl"></i>
+            </button>
+          </div>
+          
+          <div id="qrScanner" class="relative">
+            <video id="qrVideo" playsinline></video>
+            <div class="scanner-overlay">
+              <div class="scanner-frame">
+                <div class="scanner-line"></div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="p-4 bg-gray-50 text-center">
+            <p class="text-gray-600 mb-4">Arahkan kamera ke QR Code token ujian</p>
+            <button 
+              id="switchCameraBtn" 
+              class="btn-secondary text-white py-2 px-4 rounded-lg font-medium text-sm"
+            >
+              <i class="fas fa-sync-alt mr-2"></i> Ganti Kamera
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Kelas Selection (Hidden Initially) -->
+      <div id="kelasContainer" class="hidden mb-6">
+        <label class="block text-gray-700 text-sm font-medium mb-2">
+          <i class="fas fa-users mr-1 text-indigo-500"></i> Pilih Tingkat Kelas
+        </label>
+        <select 
+          id="kelasSelect" 
+          class="w-full px-4 py-3 rounded-lg input-field select-field focus:outline-none"
+        >
+          <option value="">-- Pilih Kelas --</option>
+          <option value="7">Kelas 7</option>
+          <option value="8">Kelas 8</option>
+          <option value="9">Kelas 9</option>
+        </select>
+      </div>
+      
+      <!-- Mapel Selection (Hidden Initially) -->
+      <div id="mapelContainer" class="hidden mb-6">
+        <label class="block text-gray-700 text-sm font-medium mb-2">
+          <i class="fas fa-book mr-1 text-indigo-500"></i> Pilih Mata Pelajaran
+        </label>
+        <select 
+          id="mapelSelect" 
+          class="w-full px-4 py-3 rounded-lg input-field select-field focus:outline-none"
+        >
+          <option value="">-- Pilih Mapel --</option>
+         <option value="SIM">SIMULASI</option>
+           <!--<option value="AGAMA">Agama</option>
+          <option value="BINDO">Bahasa Indonesia</option>
+          <option value="BING">Bahasa Inggris</option>
+          <option value="BAL">Bahasa Bali</option>
+          <option value="INF">Informatika</option>
+          <option value="IPA">IPA</option>
+          <option value="IPS">IPS</option>
+          <option value="PJOK">PJOK</option>
+          <option value="SENI">Seni Budaya</option>
+          <option value="PKN">PKN</option>
+          <option value="PRAK">Prakarya</option -->
+        </select>
+      </div>
+      
+      <!-- Start Button (Hidden Initially) -->
+      <button 
+        id="mulaiBtn" 
+        class="w-full btn-primary text-white py-3 px-4 rounded-lg font-medium hidden"
+      >
+        <i class="fas fa-play mr-2"></i> Mulai Ujian
+      </button>
+      
+      <!-- Exam Info (Hidden Initially) -->
+      <div id="examInfo" class="hidden mt-6 p-4 bg-indigo-50 rounded-lg">
+        <div class="flex justify-between items-center">
+          <span class="text-sm text-indigo-800 font-medium">
+            <i class="fas fa-book-open mr-1"></i> Mata Pelajaran:
+          </span>
+          <span id="currentMapel" class="text-indigo-800 font-medium">-</span>
+        </div>
+      </div>
     </div>
     
-    <div class="mapel-container" id="mapelContainer">
-      <h3 style="margin-bottom: 1rem; color: #333;">Pilih Mata Pelajaran:</h3>
-      <div class="mapel-grid" id="mapelGrid"></div>
-      <div id="mapelSelectedInfo"></div>
-    </div>
-    
-    <button id="mulaiBtn" disabled>
-      <div class="loading" id="loadingSpinner"></div>
-      <span class="button-text">🔒 Mulai Ujian</span>
-    </button>
-      <div class="loading" id="loadingSpinner"></div>
-      <span class="button-text">🔒 Mulai Ujian</span>
-    </button>
-    
-    <div id="peringatan"></div>
-    
-    <div class="security-info">
-      <h3>⚠️ Perhatian Keamanan:</h3>
-      <ul>
-        <li>Ujian akan berjalan dalam mode fullscreen</li>
-        <li>Jangan keluar dari fullscreen atau pindah tab</li>
-        <li>Pelanggaran akan mengakibatkan ujian dihentikan</li>
-        <li>Pastikan koneksi internet stabil</li>
-      </ul>
+    <!-- Footer -->
+    <div class="text-center text-gray-500 text-sm">
+      <p>Sistem Ujian Digital © 2023</p>
+      <p class="mt-1">
+        <i class="fas fa-shield-alt mr-1"></i> Mode aman diaktifkan
+      </p>
     </div>
   </div>
-
-  <div class="timer" id="timer">Waktu: 00:00</div>
   
-  <div class="fullscreen-controls" id="controls">
-    <button class="control-btn" onclick="exitExam()">❌ Keluar</button>
+  <!-- Exam Frame (Hidden Initially) -->
+  <div id="examFrameContainer" class="hidden fixed inset-0 bg-white z-50 flex flex-col">
+    <div class="bg-indigo-600 text-white p-4 flex justify-between items-center">
+      <div>
+        <span id="examTitle" class="font-medium"></span>
+        <span id="examTimer" class="ml-4"></span>
+      </div>
+      <button id="exitExamBtn" class="text-white hover:text-indigo-200">
+        <i class="fas fa-times text-xl"></i>
+      </button>
+    </div>
+    <iframe id="examFrame" class="flex-grow" frameborder="0"></iframe>
+    
+    <!-- Exam Controls -->
+    <div class="exam-controls">
+      <button id="screenshotBtn" class="exam-control-btn" title="Ambil Screenshot">
+        <i class="fas fa-camera"></i>
+      </button>
+      <button id="fullscreenBtn" class="exam-control-btn" title="Mode Layar Penuh">
+        <i class="fas fa-expand"></i>
+      </button>
+    </div>
   </div>
 
-  <iframe id="examFrame"></iframe>
+  <!-- Violation Overlay (Hidden Initially) -->
+  <div id="violationOverlay" class="violation-overlay hidden">
+    <div class="violation-icon">
+      <i class="fas fa-exclamation-triangle"></i>
+    </div>
+    <div id="violationMessage" class="violation-message">
+      Anda terdeteksi menggunakan mode layar terpisah atau aplikasi lain!
+    </div>
+    <div class="violation-timer">
+      Ujian akan dihentikan dalam: <span id="violationTimer">5</span> detik
+    </div>
+  </div>
+
+  <!-- Hidden Canvas for Screenshots -->
+  <canvas id="screenshotCanvas"></canvas>
+
+  <!-- Audio Elements -->
+  <audio id="audioSukses" src="https://assets.mixkit.co/sfx/preview/mixkit-correct-answer-tone-2870.mp3" preload="auto"></audio>
+  <audio id="audioSalah" src="https://assets.mixkit.co/sfx/preview/mixkit-wrong-answer-fail-notification-946.mp3" preload="auto"></audio>
+  <audio id="audioAlarm" src="https://assets.mixkit.co/sfx/preview/mixkit-alarm-digital-clock-beep-989.mp3" preload="auto"></audio>
+  <audio id="audioStart" src="https://assets.mixkit.co/sfx/preview/mixkit-game-show-suspense-waiting-668.mp3" preload="auto"></audio>
+  <audio id="audioBeep" src="https://assets.mixkit.co/sfx/preview/mixkit-positive-interface-beep-221.mp3" preload="auto"></audio>
+  <audio id="audioShutter" src="https://assets.mixkit.co/sfx/preview/mixkit-camera-shutter-click-1124.mp3" preload="auto"></audio>
 
   <script>
-    // Konfigurasi
-    const CONFIG = {
-      tokenRahasia: "UJIAN2025",
-      maxAttempts: 3,
-      mapel: {
-        matematika: {
-          nama: "Matematika",
-          icon: "📐",
-          url: "https://docs.google.com/forms/d/e/1FAIpQLSc_MATEMATIKA_FORM_ID/viewform?embedded=true",
-          waktu: 90, // menit
-          soal: 25
-        },
-        bahasa_indonesia: {
-          nama: "Bahasa Indonesia", 
-          icon: "📖",
-          url: "https://docs.google.com/forms/d/e/1FAIpQLSc_BAHASA_INDONESIA_FORM_ID/viewform?embedded=true",
-          waktu: 75,
-          soal: 20
-        },
-        bahasa_inggris: {
-          nama: "Bahasa Inggris",
-          icon: "🇺🇸", 
-          url: "https://docs.google.com/forms/d/e/1FAIpQLSc_BAHASA_INGGRIS_FORM_ID/viewform?embedded=true",
-          waktu: 60,
-          soal: 20
-        },
-        ipa: {
-          nama: "IPA",
-          icon: "🔬",
-          url: "https://docs.google.com/forms/d/e/1FAIpQLSc_IPA_FORM_ID/viewform?embedded=true", 
-          waktu: 80,
-          soal: 25
-        },
-        ips: {
-          nama: "IPS",
-          icon: "🌍",
-          url: "https://docs.google.com/forms/d/e/1FAIpQLSc_IPS_FORM_ID/viewform?embedded=true",
-          waktu: 70,
-          soal: 20
-        },
-        agama: {
-          nama: "Pendidikan Agama",
-          icon: "🕌",
-          url: "https://docs.google.com/forms/d/e/1FAIpQLSc_AGAMA_FORM_ID/viewform?embedded=true",
-          waktu: 60,
-          soal: 15
-        }
-      }
+    // Configuration
+    const tokenRahasia = "UJIAN2025";
+    const SCREENSHOT_INTERVAL = 30000; // 30 seconds
+    const VIOLATION_TIMEOUT = 5000; // 5 seconds
+    
+    // Form links configuration
+    const formLinks = {
+      "7-SIM" : "https://forms.gle/CTiCxBUZHR3dTGwL8",
+      "8-SIM" : "https://forms.gle/411wMh8fnwkJMKVG6",
+      "7-IPA": "https://forms.gle/link-kelas7-ipa",
+      "7-BINDO": "https://forms.gle/link-kelas7-bindo",
+      "8-IPA": "https://forms.gle/link-kelas8-ipa",
+      "9-PKN": "https://forms.gle/link-kelas9-pkn",
+      // Add more combinations as needed
     };
-
-    // Audio Context untuk suara
-    let audioContext;
-    let isExamStarted = false;
-    let startTime;
-    let timerInterval;
-    let attempts = 0;
-    let selectedMapel = null;
-
-    // Elements
+    
+    // Mapel names for display
+    const mapelNames = {
+      "AGAMA": "Agama",
+      "BINDO": "Bahasa Indonesia",
+      "BING": "Bahasa Inggris",
+      "BAL": "Bahasa Bali",
+      "INF": "Informatika",
+      "IPA": "IPA",
+      "IPS": "IPS",
+      "PJOK": "PJOK",
+      "SENI": "Seni Budaya",
+      "PKN": "PKN",
+      "PRAK": "Prakarya",
+      "SIM" : "Simulasi",
+      "MAT" : "Matematika"
+    };
+    
+    // DOM Elements
     const tokenInput = document.getElementById('tokenInput');
+    const togglePassword = document.getElementById('togglePassword');
+    const kelasSelect = document.getElementById('kelasSelect');
+    const mapelSelect = document.getElementById('mapelSelect');
+    const kelasContainer = document.getElementById('kelasContainer');
+    const mapelContainer = document.getElementById('mapelContainer');
     const mulaiBtn = document.getElementById('mulaiBtn');
     const peringatan = document.getElementById('peringatan');
-    const mainContainer = document.getElementById('mainContainer');
+    const examInfo = document.getElementById('examInfo');
+    const currentMapel = document.getElementById('currentMapel');
+    const examFrameContainer = document.getElementById('examFrameContainer');
     const examFrame = document.getElementById('examFrame');
-    const timer = document.getElementById('timer');
-    const controls = document.getElementById('controls');
-    const loadingSpinner = document.getElementById('loadingSpinner');
-    const mapelContainer = document.getElementById('mapelContainer');
-    const mapelGrid = document.getElementById('mapelGrid');
-    const mapelSelectedInfo = document.getElementById('mapelSelectedInfo');
-
-    // Initialize audio context
-    function initAudio() {
-      if (!audioContext) {
-        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    const examTitle = document.getElementById('examTitle');
+    const exitExamBtn = document.getElementById('exitExamBtn');
+    const scanQRBtn = document.getElementById('scanQRBtn');
+    const qrScannerModal = document.getElementById('qrScannerModal');
+    const closeScannerBtn = document.getElementById('closeScannerBtn');
+    const switchCameraBtn = document.getElementById('switchCameraBtn');
+    const qrVideo = document.getElementById('qrVideo');
+    const screenshotBtn = document.getElementById('screenshotBtn');
+    const fullscreenBtn = document.getElementById('fullscreenBtn');
+    const screenshotCanvas = document.getElementById('screenshotCanvas');
+    const violationOverlay = document.getElementById('violationOverlay');
+    const violationMessage = document.getElementById('violationMessage');
+    const violationTimer = document.getElementById('violationTimer');
+    const examTimer = document.getElementById('examTimer');
+    
+    // Audio Elements
+    const audioSukses = document.getElementById('audioSukses');
+    const audioSalah = document.getElementById('audioSalah');
+    const audioAlarm = document.getElementById('audioAlarm');
+    const audioStart = document.getElementById('audioStart');
+    const audioBeep = document.getElementById('audioBeep');
+    const audioShutter = document.getElementById('audioShutter');
+    
+    // Variables
+    let qrStream = null;
+    let currentCamera = 'environment'; // back camera by default
+    let screenshotInterval;
+    let examStartTime;
+    let examDurationInterval;
+    let splitScreenCheckInterval;
+    let violationCountdown;
+    
+    // Toggle password visibility
+    togglePassword.addEventListener('click', () => {
+      const type = tokenInput.getAttribute('type') === 'password' ? 'text' : 'password';
+      tokenInput.setAttribute('type', type);
+      togglePassword.innerHTML = type === 'password' ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
+    });
+    
+    // Token validation
+    tokenInput.addEventListener('input', () => {
+      validateToken(tokenInput.value.trim());
+    });
+    
+    function validateToken(token) {
+      if (token === tokenRahasia) {
+        peringatan.textContent = '';
+        peringatan.classList.remove('text-red-500');
+        peringatan.classList.add('text-green-500');
+        peringatan.innerHTML = '<i class="fas fa-check-circle mr-1"></i> Token valid!';
+        kelasContainer.classList.remove('hidden');
+        audioSukses.play();
+        
+        // Add animation
+        kelasContainer.classList.add('animate__animated', 'animate__fadeIn');
+      } else {
+        kelasContainer.classList.add('hidden');
+        mapelContainer.classList.add('hidden');
+        mulaiBtn.classList.add('hidden');
+        examInfo.classList.add('hidden');
+        
+        if (token.length > 0) {
+          peringatan.textContent = 'Token salah. Silakan coba lagi.';
+          peringatan.classList.add('text-red-500');
+          peringatan.classList.remove('text-green-500');
+          audioSalah.play();
+        } else {
+          peringatan.textContent = '';
+        }
       }
     }
-
-    // Play sound function
-    function playSound(frequency, duration, type = 'sine') {
-      initAudio();
-      const oscillator = audioContext.createOscillator();
-      const gainNode = audioContext.createGain();
-      
-      oscillator.connect(gainNode);
-      gainNode.connect(audioContext.destination);
-      
-      oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
-      oscillator.type = type;
-      
-      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
-      
-      oscillator.start(audioContext.currentTime);
-      oscillator.stop(audioContext.currentTime + duration);
-    }
-
-    // Success sound
-    function playSuccessSound() {
-      playSound(523.25, 0.2); // C5
-      setTimeout(() => playSound(659.25, 0.2), 100); // E5
-      setTimeout(() => playSound(783.99, 0.3), 200); // G5
-    }
-
-    // Error sound
-    function playErrorSound() {
-      playSound(200, 0.1, 'sawtooth');
-      setTimeout(() => playSound(150, 0.2, 'sawtooth'), 100);
-    }
-
-    // Warning sound
-    function playWarningSound() {
-      playSound(440, 0.1);
-      setTimeout(() => playSound(440, 0.1), 150);
-      setTimeout(() => playSound(440, 0.1), 300);
-    }
-
-    // Create mapel selection
-    function createMapelSelection() {
-      mapelGrid.innerHTML = '';
-      
-      Object.keys(CONFIG.mapel).forEach(key => {
-        const mapel = CONFIG.mapel[key];
-        const card = document.createElement('div');
-        card.className = 'mapel-card';
-        card.dataset.mapel = key;
+    
+    // Kelas selection
+    kelasSelect.addEventListener('change', () => {
+      if (kelasSelect.value) {
+        mapelContainer.classList.remove('hidden');
+        mapelContainer.classList.add('animate__animated', 'animate__fadeIn');
+      } else {
+        mapelContainer.classList.add('hidden');
+        mulaiBtn.classList.add('hidden');
+        examInfo.classList.add('hidden');
+      }
+    });
+    
+    // Mapel selection
+    mapelSelect.addEventListener('change', () => {
+      if (mapelSelect.value) {
+        mulaiBtn.classList.remove('hidden');
+        examInfo.classList.remove('hidden');
+        currentMapel.textContent = mapelNames[mapelSelect.value] || '-';
+      } else {
+        mulaiBtn.classList.add('hidden');
+        examInfo.classList.add('hidden');
+      }
+    });
+    
+    // QR Scanner functionality
+    scanQRBtn.addEventListener('click', () => {
+      qrScannerModal.classList.remove('hidden');
+      startQRScanner();
+    });
+    
+    closeScannerBtn.addEventListener('click', () => {
+      stopQRScanner();
+      qrScannerModal.classList.add('hidden');
+    });
+    
+    switchCameraBtn.addEventListener('click', () => {
+      currentCamera = currentCamera === 'environment' ? 'user' : 'environment';
+      stopQRScanner();
+      startQRScanner();
+    });
+    
+    function startQRScanner() {
+      navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: currentCamera,
+          width: { ideal: 1280 },
+          height: { ideal: 720 }
+        },
+        audio: false
+      }).then(stream => {
+        qrStream = stream;
+        qrVideo.srcObject = stream;
+        qrVideo.play();
         
-        card.innerHTML = `
-          <span class="mapel-icon">${mapel.icon}</span>
-          <div class="mapel-name">${mapel.nama}</div>
-          <div class="mapel-info">${mapel.soal} soal • ${mapel.waktu} menit</div>
-        `;
+        const canvasElement = document.createElement('canvas');
+        const canvas = canvasElement.getContext('2d');
         
-        card.addEventListener('click', () => selectMapel(key));
-        mapelGrid.appendChild(card);
+        function scanQR() {
+          if (qrVideo.readyState === qrVideo.HAVE_ENOUGH_DATA) {
+            canvasElement.height = qrVideo.videoHeight;
+            canvasElement.width = qrVideo.videoWidth;
+            canvas.drawImage(qrVideo, 0, 0, canvasElement.width, canvasElement.height);
+            
+            const imageData = canvas.getImageData(0, 0, canvasElement.width, canvasElement.height);
+            const code = jsQR(imageData.data, imageData.width, imageData.height, {
+              inversionAttempts: 'dontInvert',
+            });
+            
+            if (code) {
+              audioBeep.play();
+              validateToken(code.data);
+              stopQRScanner();
+              qrScannerModal.classList.add('hidden');
+              return;
+            }
+          }
+          
+          requestAnimationFrame(scanQR);
+        }
+        
+        requestAnimationFrame(scanQR);
+      }).catch(err => {
+        console.error('Error accessing camera:', err);
+        Swal.fire({
+          icon: 'error',
+          title: 'Akses Kamera Gagal',
+          text: 'Tidak dapat mengakses kamera. Pastikan Anda memberikan izin akses kamera.',
+          confirmButtonText: 'OK',
+          background: '#ffffff'
+        });
       });
     }
-
-    // Select mapel
-    function selectMapel(key) {
-      selectedMapel = key;
-      const mapel = CONFIG.mapel[key];
+    
+    function stopQRScanner() {
+      if (qrStream) {
+        qrStream.getTracks().forEach(track => track.stop());
+        qrStream = null;
+      }
+      if (qrVideo.srcObject) {
+        qrVideo.srcObject = null;
+      }
+    }
+    
+    // Start exam
+    mulaiBtn.addEventListener('click', async () => {
+      const kelas = kelasSelect.value;
+      const mapel = mapelSelect.value;
+      const key = `${kelas}-${mapel}`;
+      const link = formLinks[key];
       
-      // Update visual selection
-      document.querySelectorAll('.mapel-card').forEach(card => {
-        card.classList.remove('selected');
-      });
-      document.querySelector(`[data-mapel="${key}"]`).classList.add('selected');
+      if (!link) {
+        showAlert('Kombinasi kelas dan mata pelajaran ini belum tersedia.', 'error');
+        return;
+      }
       
-      // Show mapel info
-      mapelSelectedInfo.innerHTML = `
-        <h4>${mapel.icon} ${mapel.nama} - Detail Ujian</h4>
-        <ul>
-          <li><strong>Jumlah Soal:</strong> ${mapel.soal} soal</li>
-          <li><strong>Waktu:</strong> ${mapel.waktu} menit</li>
-          <li><strong>Status:</strong> Siap dimulai</li>
-        </ul>
+      // Play start sound
+      audioStart.play();
+      
+      // Show confirmation dialog
+      const confirmed = await showConfirmation(
+        'Konfirmasi Mulai Ujian',
+        `Anda akan memulai ujian ${mapelNames[mapel]} untuk kelas ${kelas}. Pastikan Anda siap sebelum memulai.`,
+        'Mulai Sekarang',
+        'Batalkan'
+      );
+      
+      if (!confirmed) return;
+      
+      try {
+        // Attempt fullscreen
+        await document.documentElement.requestFullscreen();
+      } catch (err) {
+        console.error('Fullscreen error:', err);
+        showAlert('Gagal masuk mode fullscreen. Lanjutkan manual.', 'warning');
+      }
+      
+      // Show exam frame
+      examFrame.src = link;
+      examTitle.textContent = `Ujian ${mapelNames[mapel]} - Kelas ${kelas}`;
+      examFrameContainer.classList.remove('hidden');
+      
+      // Hide main interface
+      document.querySelector('.card').classList.add('hidden');
+      
+      // Start exam timer
+      examStartTime = new Date();
+      updateExamTimer();
+      examDurationInterval = setInterval(updateExamTimer, 1000);
+      
+      // Start screenshot interval
+      startScreenshotInterval();
+      
+      // Start split screen detection
+      startSplitScreenDetection();
+    });
+    
+    // Update exam timer display
+    function updateExamTimer() {
+      const now = new Date();
+      const diff = new Date(now - examStartTime);
+      const hours = diff.getUTCHours().toString().padStart(2, '0');
+      const minutes = diff.getUTCMinutes().toString().padStart(2, '0');
+      const seconds = diff.getUTCSeconds().toString().padStart(2, '0');
+      examTimer.textContent = `${hours}:${minutes}:${seconds}`;
+    }
+    
+    // Start screenshot interval
+    function startScreenshotInterval() {
+      // Take initial screenshot
+      takeScreenshot();
+      
+      // Set interval for periodic screenshots
+      screenshotInterval = setInterval(takeScreenshot, SCREENSHOT_INTERVAL);
+    }
+    
+    // Take screenshot of exam
+    function takeScreenshot() {
+      // Play shutter sound
+      audioShutter.play();
+      
+      // Create canvas with same dimensions as exam frame
+      const iframe = examFrame;
+      const canvas = screenshotCanvas;
+      canvas.width = iframe.offsetWidth;
+      canvas.height = iframe.offsetHeight;
+      
+      // Draw iframe content to canvas (note: this only works for same-origin iframes)
+      try {
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(iframe, 0, 0, canvas.width, canvas.height);
+        
+        // Convert canvas to image data
+        const imageData = canvas.toDataURL('image/png');
+        
+        // Here you would typically send the screenshot to your server
+        console.log('Screenshot taken:', imageData);
+        
+        // Show notification
+        showScreenshotNotification();
+      } catch (err) {
+        console.error('Error taking screenshot:', err);
+      }
+    }
+    
+    // Show screenshot notification
+    function showScreenshotNotification() {
+      const notification = document.createElement('div');
+      notification.className = 'fixed bottom-4 left-4 bg-indigo-600 text-white px-4 py-2 rounded-lg shadow-lg flex items-center animate__animated animate__fadeInUp';
+      notification.innerHTML = `
+        <i class="fas fa-camera mr-2"></i>
+        <span>Screenshot diambil</span>
       `;
-      mapelSelectedInfo.className = 'mapel-selected-info';
-      
-      playSuccessSound();
-      updateButtonState();
-    }
-    function showMessage(message, type = 'error') {
-      peringatan.textContent = message;
-      peringatan.className = `show ${type}`;
-      
-      if (type === 'error') {
-        playErrorSound();
-      } else if (type === 'success') {
-        playSuccessSound();
-      } else if (type === 'warning') {
-        playWarningSound();
-      }
+      document.body.appendChild(notification);
       
       setTimeout(() => {
-        peringatan.classList.remove('show');
-      }, 5000);
+        notification.classList.add('animate__fadeOutDown');
+        setTimeout(() => notification.remove(), 500);
+      }, 3000);
     }
-
-    // Validate token
-    function validateToken() {
-      const token = tokenInput.value.trim();
-      
-      if (token === '') {
-        tokenInput.classList.remove('valid', 'invalid');
-        mapelContainer.classList.remove('show');
-        updateButtonState();
-        return;
-      }
-      
-      if (token === CONFIG.tokenRahasia) {
-        tokenInput.classList.remove('invalid');
-        tokenInput.classList.add('valid');
-        mapelContainer.classList.add('show');
-        updateButtonState();
-        // Tidak ada peringatan saat token benar
-      } else {
-        tokenInput.classList.remove('valid');
-        tokenInput.classList.add('invalid');
-        mapelContainer.classList.remove('show');
-        updateButtonState();
-        // Tidak ada peringatan saat mengetik token salah
-      }
-    }
-
-    // Update button state
-    function updateButtonState() {
-      const tokenValid = tokenInput.value.trim() === CONFIG.tokenRahasia;
-      const mapelSelected = selectedMapel !== null;
-      
-      mulaiBtn.disabled = !(tokenValid && mapelSelected);
-      
-      if (tokenValid && mapelSelected) {
-        mulaiBtn.innerHTML = `
-          <div class="loading" id="loadingSpinner"></div>
-          <span class="button-text">🚀 Mulai Ujian ${CONFIG.mapel[selectedMapel].nama}</span>
-        `;
-      } else {
-        mulaiBtn.innerHTML = `
-          <div class="loading" id="loadingSpinner"></div>
-          <span class="button-text">🔒 Mulai Ujian</span>
-        `;
-      }
-    }
-
-    // Start exam
-    async function startExam() {
+    
+    // Manual screenshot button
+    screenshotBtn.addEventListener('click', () => {
+      takeScreenshot();
+    });
+    
+    // Fullscreen button
+    fullscreenBtn.addEventListener('click', async () => {
       try {
-        loadingSpinner.style.display = 'inline-block';
-        mulaiBtn.disabled = true;
-        
-        // Request fullscreen
-        if (document.documentElement.requestFullscreen) {
+        if (!document.fullscreenElement) {
           await document.documentElement.requestFullscreen();
-        } else if (document.documentElement.webkitRequestFullscreen) {
-          await document.documentElement.webkitRequestFullscreen();
-        } else if (document.documentElement.mozRequestFullScreen) {
-          await document.documentElement.mozRequestFullScreen();
-        } else if (document.documentElement.msRequestFullscreen) {
-          await document.documentElement.msRequestFullscreen();
+        } else {
+          await document.exitFullscreen();
         }
-        
-        // Hide main container and show exam
-        mainContainer.style.display = 'none';
-        examFrame.src = CONFIG.mapel[selectedMapel].url;
-        examFrame.style.display = 'block';
-        controls.style.display = 'block';
-        
-        // Start timer
-        startTime = Date.now();
-        timer.style.display = 'block';
-        startTimer();
-        
-        isExamStarted = true;
-        playSuccessSound();
-        
-        // Show success message briefly
-        document.body.style.background = '#4CAF50';
-        setTimeout(() => {
-          document.body.style.background = '#000';
-        }, 1000);
-        
-      } catch (error) {
-        console.error('Fullscreen error:', error);
-        showMessage('⚠️ Tidak dapat masuk fullscreen. Silakan aktifkan secara manual dan coba lagi.', 'warning');
-        loadingSpinner.style.display = 'none';
-        mulaiBtn.disabled = false;
+      } catch (err) {
+        console.error('Fullscreen error:', err);
+      }
+    });
+    
+    // Start split screen detection
+    function startSplitScreenDetection() {
+      // Check initially
+      checkSplitScreen();
+      
+      // Set interval for periodic checks
+      splitScreenCheckInterval = setInterval(checkSplitScreen, 1000);
+    }
+    
+    // Check for split screen or other windows
+    function checkSplitScreen() {
+      // Method 1: Check window dimensions vs screen dimensions
+      const isSplitScreen = window.outerWidth < screen.availWidth * 0.9;
+      
+      // Method 2: Check if window is not in fullscreen
+      const isNotFullscreen = !document.fullscreenElement;
+      
+      // Method 3: Check if window is not focused (may indicate another window is active)
+      const isWindowNotFocused = !document.hasFocus();
+      
+      if (isSplitScreen || (isNotFullscreen && isWindowNotFocused)) {
+        handleViolation('Anda terdeteksi menggunakan mode layar terpisah atau aplikasi lain!');
       }
     }
-
-    // Timer function
-    function startTimer() {
-      timerInterval = setInterval(() => {
-        const elapsed = Date.now() - startTime;
-        const minutes = Math.floor(elapsed / 60000);
-        const seconds = Math.floor((elapsed % 60000) / 1000);
-        timer.textContent = `Waktu: ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    
+    // Exit exam button
+    exitExamBtn.addEventListener('click', () => {
+      showExitConfirmation();
+    });
+    
+    // Fullscreen and visibility change handlers
+    document.addEventListener('fullscreenchange', () => {
+      if (!document.fullscreenElement) {
+        handleViolation('Anda keluar dari mode fullscreen!');
+      }
+    });
+    
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        handleViolation('Anda berpindah tab atau minimize browser!');
+      }
+    });
+    
+    // Window resize handler for split screen detection
+    window.addEventListener('resize', () => {
+      if (examFrameContainer.classList.contains('hidden')) return;
+      checkSplitScreen();
+    });
+    
+    // Window focus/blur handlers
+    window.addEventListener('blur', () => {
+      if (examFrameContainer.classList.contains('hidden')) return;
+      checkSplitScreen();
+    });
+    
+    // Violation handler
+    function handleViolation(message) {
+      // Show violation overlay
+      violationMessage.textContent = message;
+      violationOverlay.classList.remove('hidden');
+      audioAlarm.play();
+      
+      // Start countdown
+      let seconds = 5;
+      violationTimer.textContent = seconds;
+      violationCountdown = setInterval(() => {
+        seconds--;
+        violationTimer.textContent = seconds;
+        
+        if (seconds <= 0) {
+          clearInterval(violationCountdown);
+          endExamDueToViolation();
+        }
       }, 1000);
     }
-
-    // Exit exam
-    function exitExam() {
-      if (confirm('Apakah Anda yakin ingin keluar dari ujian?')) {
-        playWarningSound();
-        if (timerInterval) {
-          clearInterval(timerInterval);
-        }
+    
+    // End exam due to violation
+    function endExamDueToViolation() {
+      // Clear intervals
+      clearInterval(screenshotInterval);
+      clearInterval(examDurationInterval);
+      clearInterval(splitScreenCheckInterval);
+      clearInterval(violationCountdown);
+      
+      // Hide violation overlay
+      violationOverlay.classList.add('hidden');
+      
+      // Exit fullscreen
+      document.exitFullscreen();
+      
+      // Reload page
+      setTimeout(() => {
+        location.reload();
+      }, 1000);
+    }
+    
+    // UI Helper functions
+    function showAlert(message, type = 'info') {
+      const icon = {
+        error: 'exclamation-circle',
+        warning: 'exclamation-triangle',
+        success: 'check-circle',
+        info: 'info-circle'
+      }[type];
+      
+      Swal.fire({
+        icon: type,
+        title: message,
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        background: '#ffffff',
+        backdrop: `rgba(${type === 'error' ? '239,68,68' : '59,130,246'},0.2)`
+      });
+    }
+    
+    async function showConfirmation(title, text, confirmText, cancelText) {
+      return Swal.fire({
+        title: title,
+        text: text,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#4f46e5',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: `<i class="fas fa-play mr-2"></i> ${confirmText}`,
+        cancelButtonText: `<i class="fas fa-times mr-2"></i> ${cancelText}`,
+        background: '#ffffff',
+        backdrop: 'rgba(79, 70, 229, 0.1)'
+      }).then((result) => result.isConfirmed);
+    }
+    
+    async function showExitConfirmation() {
+      const confirmed = await showConfirmation(
+        'Keluar dari Ujian?',
+        'Anda yakin ingin keluar dari ujian? Semua progress akan hilang.',
+        'Ya, Keluar',
+        'Lanjutkan Ujian'
+      );
+      
+      if (confirmed) {
+        // Clear intervals
+        clearInterval(screenshotInterval);
+        clearInterval(examDurationInterval);
+        clearInterval(splitScreenCheckInterval);
+        
+        // Exit fullscreen
+        document.exitFullscreen();
+        
+        // Reload page
         location.reload();
       }
     }
-
-    // Event listeners
-    tokenInput.addEventListener('input', validateToken);
     
-    tokenInput.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter' && !mulaiBtn.disabled) {
-        // Cek token dan mapel
-        const token = tokenInput.value.trim();
-        if (token !== CONFIG.tokenRahasia) {
-          attempts++;
-          tokenInput.classList.add('invalid');
-          playErrorSound();
-          
-          if (attempts >= CONFIG.maxAttempts) {
-            showMessage(`❌ Token salah ${attempts} kali. Halaman akan dimuat ulang dalam 3 detik...`, 'error');
-            setTimeout(() => location.reload(), 3000);
-          } else {
-            showMessage(`❌ Token salah! Sisa percobaan: ${CONFIG.maxAttempts - attempts}`, 'error');
-          }
-          return;
-        }
-        
-        if (!selectedMapel) {
-          showMessage('⚠️ Silakan pilih mata pelajaran terlebih dahulu!', 'warning');
-          return;
-        }
-        
-        startExam();
-      }
+    // Clean up on page unload
+    window.addEventListener('beforeunload', () => {
+      stopQRScanner();
     });
-
-    mulaiBtn.addEventListener('click', () => {
-      // Cek token dan mapel
-      const token = tokenInput.value.trim();
-      if (token !== CONFIG.tokenRahasia) {
-        attempts++;
-        tokenInput.classList.add('invalid');
-        playErrorSound();
-        
-        if (attempts >= CONFIG.maxAttempts) {
-          showMessage(`❌ Token salah ${attempts} kali. Halaman akan dimuat ulang dalam 3 detik...`, 'error');
-          setTimeout(() => location.reload(), 3000);
-        } else {
-          showMessage(`❌ Token salah! Sisa percobaan: ${CONFIG.maxAttempts - attempts}`, 'error');
-        }
-        return;
-      }
-      
-      if (!selectedMapel) {
-        showMessage('⚠️ Silakan pilih mata pelajaran terlebih dahulu!', 'warning');
-        return;
-      }
-      
-      startExam();
-    });
-
-    // Security monitoring
-    document.addEventListener('fullscreenchange', () => {
-      if (isExamStarted && !document.fullscreenElement) {
-        playErrorSound();
-        alert('⚠️ Anda keluar dari fullscreen! Ujian akan dihentikan untuk menjaga keamanan.');
-        location.reload();
-      }
-    });
-
-    document.addEventListener('visibilitychange', () => {
-      if (isExamStarted && document.hidden) {
-        playErrorSound();
-        alert('⚠️ Anda pindah tab atau minimize browser! Ujian akan dihentikan untuk menjaga keamanan.');
-        location.reload();
-      }
-    });
-
-    // Prevent right click and key shortcuts
-    document.addEventListener('contextmenu', (e) => {
-      if (isExamStarted) {
-        e.preventDefault();
-        playWarningSound();
-        showMessage('⚠️ Klik kanan dinonaktifkan selama ujian', 'warning');
-      }
-    });
-
-    document.addEventListener('keydown', (e) => {
-      if (isExamStarted) {
-        // Prevent F12, Ctrl+Shift+I, Ctrl+U, etc.
-        if (e.key === 'F12' || 
-            (e.ctrlKey && e.shiftKey && e.key === 'I') ||
-            (e.ctrlKey && e.key === 'u') ||
-            (e.ctrlKey && e.shiftKey && e.key === 'C')) {
-          e.preventDefault();
-          playWarningSound();
-          showMessage('⚠️ Shortcut keyboard diblokir selama ujian', 'warning');
-        }
-      }
-    });
-
-    // Initialize
-    document.addEventListener('DOMContentLoaded', () => {
-      tokenInput.focus();
-      createMapelSelection();
-      
-      // Vibration support for mobile
-      if ('vibrate' in navigator) {
-        window.vibrate = (pattern) => navigator.vibrate(pattern);
-      } else {
-        window.vibrate = () => {};
-      }
-    });
-
-    // Add vibration to sounds on mobile
-    const originalPlayErrorSound = playErrorSound;
-    playErrorSound = function() {
-      originalPlayErrorSound();
-      if (window.vibrate) window.vibrate([100, 50, 100]);
-    };
-
-    const originalPlayWarningSound = playWarningSound;
-    playWarningSound = function() {
-      originalPlayWarningSound();
-      if (window.vibrate) window.vibrate([50]);
-    };
-
-    const originalPlaySuccessSound = playSuccessSound;
-    playSuccessSound = function() {
-      originalPlaySuccessSound();
-      if (window.vibrate) window.vibrate([25, 25, 50]);
-    };
   </script>
 </body>
 </html>
