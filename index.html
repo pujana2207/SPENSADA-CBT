@@ -2,1077 +2,401 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
+  <title>Ujian QR - iPhone Only</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ujian Online - Sistem Ujian Digital</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="mobile-web-app-capable" content="yes">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
     
     body {
       font-family: 'Poppins', sans-serif;
-      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-      min-height: 100vh;
-      -webkit-tap-highlight-color: transparent;
+      background-color: #f8fafc;
     }
     
-    .card {
-      backdrop-filter: blur(16px) saturate(180%);
-      -webkit-backdrop-filter: blur(16px) saturate(180%);
-      background-color: rgba(255, 255, 255, 0.85);
-      border-radius: 12px;
-      border: 1px solid rgba(209, 213, 219, 0.3);
-      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.1);
+    .qr-scanner {
+      position: relative;
+      width: 100%;
+      max-width: 400px;
+      margin: 0 auto;
+      border-radius: 1rem;
+      overflow: hidden;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+    
+    .qr-box {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 250px;
+      height: 250px;
+      border: 3px solid #3b82f6;
+      border-radius: 0.5rem;
+      z-index: 10;
+    }
+    
+    .qr-line {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background-color: #3b82f6;
+      animation: scan 2s infinite linear;
+      box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+    }
+    
+    @keyframes scan {
+      0% { top: 0; }
+      100% { top: 100%; }
+    }
+    
+    .select-option {
       transition: all 0.3s ease;
     }
     
-    .card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.15);
-    }
-    
-    .input-field {
-      transition: all 0.3s ease;
-      border: 2px solid #e2e8f0;
-    }
-    
-    .input-field:focus {
-      border-color: #4f46e5;
-      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+    .select-option:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
     
     .btn-primary {
-      background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
       transition: all 0.3s ease;
     }
     
     .btn-primary:hover {
       transform: translateY(-2px);
-      box-shadow: 0 5px 15px -5px rgba(79, 70, 229, 0.6);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
     
     .btn-primary:active {
       transform: translateY(0);
     }
     
-    .btn-secondary {
-      background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
-      transition: all 0.3s ease;
+    .token-badge {
+      animation: pulse 2s infinite;
     }
     
-    .btn-secondary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 5px 15px -5px rgba(59, 130, 246, 0.6);
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4); }
+      70% { box-shadow: 0 0 0 10px rgba(59, 130, 246, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
     }
     
-    .select-field {
-      appearance: none;
-      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
-      background-position: right 0.5rem center;
-      background-repeat: no-repeat;
-      background-size: 1.5em 1.5em;
-    }
-    
-    #qrScanner {
+    iframe {
       width: 100%;
-      max-width: 400px;
-      height: 300px;
-      margin: 0 auto;
-      background: black;
-      position: relative;
+      height: 100vh;
+      border: none;
+    }
+    
+    .blur-text {
+      filter: blur(5px);
+      transition: filter 0.3s ease;
+    }
+    
+    .blur-text:hover {
+      filter: none;
+    }
+    
+    .browser-warning {
+      background-color: #FFFBEB;
+      border: 1px solid #F59E0B;
+      color: #92400E;
+      padding: 12px;
       border-radius: 8px;
-      overflow: hidden;
-    }
-    
-    #qrScanner video {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-    
-    .scanner-overlay {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+      margin-bottom: 16px;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: rgba(0, 0, 0, 0.5);
-    }
-    
-    .scanner-frame {
-      width: 70%;
-      height: 70%;
-      border: 3px solid #4f46e5;
-      border-radius: 8px;
-      position: relative;
-      box-shadow: 0 0 0 1000px rgba(0, 0, 0, 0.5);
-    }
-    
-    .scanner-line {
-      position: absolute;
-      width: 100%;
-      height: 4px;
-      background: linear-gradient(90deg, transparent, #4f46e5, transparent);
-      animation: scan 2s linear infinite;
-    }
-    
-    @keyframes scan {
-      0% { top: 0; opacity: 0; }
-      10% { opacity: 1; }
-      90% { opacity: 1; }
-      100% { top: 100%; opacity: 0; }
-    }
-    
-    #screenshotCanvas {
-      display: none;
-    }
-    
-    .exam-controls {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      z-index: 1000;
-      display: flex;
-      gap: 10px;
-    }
-    
-    .exam-control-btn {
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      background: #4f46e5;
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-    
-    .exam-control-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
-    }
-    
-    .exam-control-btn:active {
-      transform: translateY(0);
-    }
-    
-    .violation-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0, 0, 0, 0.9);
-      z-index: 2000;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      text-align: center;
-      padding: 20px;
-    }
-    
-    .violation-icon {
-      font-size: 5rem;
-      color: #ef4444;
-      margin-bottom: 2rem;
-    }
-    
-    .violation-message {
-      font-size: 1.5rem;
-      margin-bottom: 2rem;
-      max-width: 600px;
-    }
-    
-    .violation-timer {
-      font-size: 2rem;
-      font-weight: bold;
-      color: #ef4444;
-    }
-    
-    /* Fullscreen styles */
-    :fullscreen, ::-webkit-full-screen {
-      background-color: white;
-    }
-    
-    /* iOS specific styles */
-    @supports (-webkit-touch-callout: none) {
-      body {
-        /* Prevent overscroll bounce on iOS */
-        overscroll-behavior-y: none;
-        -webkit-overflow-scrolling: touch;
-      }
-      
-      /* Fix for Safari viewport units */
-      .full-height {
-        height: 100vh;
-        height: -webkit-fill-available;
-      }
-    }
-    
-    /* Android Chrome address bar hiding */
-    .fullscreen {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 9999;
-    }
-    
-    @media (max-width: 640px) {
-      .mobile-padding {
-        padding: 1rem;
-      }
-      
-      .mobile-text {
-        font-size: 1.5rem;
-      }
-      
-      .input-field, .select-field {
-        padding: 0.75rem;
-      }
-      
-      #qrScanner {
-        height: 250px;
-      }
-      
-      .violation-message {
-        font-size: 1.2rem;
-      }
-      
-      .violation-timer {
-        font-size: 1.5rem;
-      }
-      
-      /* Mobile fullscreen adjustments */
-      #examFrameContainer {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-      }
-      
-      .exam-controls {
-        bottom: 10px;
-        right: 10px;
-      }
-      
-      .exam-control-btn {
-        width: 45px;
-        height: 45px;
-        font-size: 0.9rem;
-      }
+      gap: 8px;
     }
   </style>
 </head>
-<body class="flex items-center justify-center p-4 mobile-padding">
-  <div class="w-full max-w-md mx-auto">
-    <!-- Main Card -->
-    <div class="card p-8 mb-6">
-      <!-- Logo/Header -->
-      <div class="text-center mb-8">
-        <div class="w-20 h-20 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
-          <img src="https://i.ibb.co.com/3YjdDh2N/logo-sekolah-FINAL.png" alt="Logo Sekolah" class="h-14 w-14 object-contain">
-        </div>
-        <h1 class="text-2xl font-bold text-gray-800 mobile-text">Sistem Ujian Digital SMP Negeri 1 Sukasada</h1>
-        <p class="text-gray-600 mt-2">Scan QR Code atau masukkan token untuk memulai ujian</p>
-      </div>
-      
-      <!-- QR Scanner Button -->
-      <button 
-        id="scanQRBtn"
-        class="w-full btn-secondary text-white py-3 px-4 rounded-lg font-medium mb-4"
-      >
-        <i class="fas fa-qrcode mr-2"></i> Scan QR Code
-      </button>
-      
-      <div class="flex items-center my-4">
-        <div class="flex-grow border-t border-gray-300"></div>
-        <span class="mx-4 text-gray-500">atau</span>
-        <div class="flex-grow border-t border-gray-300"></div>
-      </div>
-      
-      <!-- Token Input -->
-      <div class="mb-6">
-        <div class="relative">
-          <input 
-            type="password" 
-            id="tokenInput" 
-            placeholder="Masukkan token ujian" 
-            autocomplete="off"
-            class="w-full px-4 py-3 rounded-lg input-field focus:outline-none"
-          >
-          <button 
-            id="togglePassword" 
-            class="absolute right-3 top-3 text-gray-500 hover:text-gray-700"
-            type="button"
-          >
-            <i class="fas fa-eye"></i>
-          </button>
-        </div>
-        <div id="peringatan" class="text-red-500 text-sm mt-2 flex items-center">
-          <i class="fas fa-exclamation-circle mr-1"></i>
-          <span></span>
+<body class="min-h-screen bg-gray-50">
+  <div class="container mx-auto px-4 py-8 max-w-md">
+    <!-- Browser Warning at the top -->
+    <div class="browser-warning">
+      <i class="fas fa-exclamation-triangle text-yellow-600"></i>
+      <span class="font-medium">Pastikan Anda menggunakan iPhone dengan browser Safari</span>
+    </div>
+    
+    <!-- Header with School Logo -->
+    <div class="text-center mb-8">
+      <div class="flex items-center justify-center mb-4">
+        <div class="w-20 h-20 bg-blue-500 rounded-full flex items-center justify-center ml-4 shadow-lg">
+         <img src="https://i.ibb.co.com/3YjdDh2N/logo-sekolah-FINAL.png" alt="Logo Sekolah" class="h-14 w-14 object-contain">
         </div>
       </div>
-      
-      <!-- QR Scanner Modal -->
-      <div id="qrScannerModal" class="hidden fixed inset-0 bg-black bg-opacity-90 z-50 flex flex-col items-center justify-center p-4">
-        <div class="w-full max-w-md bg-white rounded-lg overflow-hidden">
-          <div class="bg-indigo-600 text-white p-4 flex justify-between items-center">
-            <h2 class="text-lg font-medium">Scan QR Code Token</h2>
-            <button id="closeScannerBtn" class="text-white hover:text-indigo-200">
-              <i class="fas fa-times text-xl"></i>
-            </button>
-          </div>
-          
-          <div id="qrScanner" class="relative">
-            <video id="qrVideo" playsinline></video>
-            <div class="scanner-overlay">
-              <div class="scanner-frame">
-                <div class="scanner-line"></div>
-              </div>
+      <h1 class="text-3xl font-bold text-gray-800 mb-2">Ujian QR</h1>
+      <p class="text-gray-600">Scan QR Token untuk memulai ujian</p>
+    </div>
+    
+    <!-- Warning for non-iPhone users -->
+    <div id="peringatan" class="hidden bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded">
+      <div class="flex items-center">
+        <i class="fas fa-exclamation-circle mr-2"></i>
+        <p class="font-medium">⚠️ Ujian hanya bisa diakses menggunakan iPhone (Safari).</p>
+      </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div id="formContainer" class="bg-white rounded-xl shadow-md p-6">
+      <!-- QR Scanner Section -->
+      <div class="mb-8">
+        <button id="scanBtn" onclick="startScanner()" class="btn-primary w-full bg-blue-500 hover:bg-blue-600 text-white font-medium py-3 px-4 rounded-lg flex items-center justify-center">
+          <i class="fas fa-camera mr-2"></i> Scan QR Token
+        </button>
+        
+        <div id="scannerContainer" class="hidden mt-4">
+          <div class="qr-scanner">
+            <video id="preview" class="w-full" autoplay playsinline></video>
+            <div class="qr-box">
+              <div class="qr-line"></div>
             </div>
           </div>
-          
-          <div class="p-4 bg-gray-50 text-center">
-            <p class="text-gray-600 mb-4">Arahkan kamera ke QR Code token ujian</p>
-            <button 
-              id="switchCameraBtn" 
-              class="btn-secondary text-white py-2 px-4 rounded-lg font-medium text-sm"
-            >
-              <i class="fas fa-sync-alt mr-2"></i> Ganti Kamera
-            </button>
-          </div>
+          <button id="stopScanBtn" onclick="stopScanner()" class="mt-4 w-full bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-4 rounded-lg flex items-center justify-center">
+            <i class="fas fa-stop mr-2"></i> Stop Scanner
+          </button>
+        </div>
+        
+        <div id="tokenBadge" class="hidden mt-4 bg-blue-100 text-blue-800 px-4 py-2 rounded-full inline-flex items-center token-badge">
+          <i class="fas fa-check-circle mr-2"></i>
+          <span id="tokenValue" class="blur-text hover:filter-none cursor-pointer">Token berhasil diverifikasi</span>
         </div>
       </div>
       
-      <!-- Kelas Selection (Hidden Initially) -->
-      <div id="kelasContainer" class="hidden mb-6">
-        <label class="block text-gray-700 text-sm font-medium mb-2">
-          <i class="fas fa-users mr-1 text-indigo-500"></i> Pilih Tingkat Kelas
-        </label>
-        <select 
-          id="kelasSelect" 
-          class="w-full px-4 py-3 rounded-lg input-field select-field focus:outline-none"
-        >
-          <option value="">-- Pilih Kelas --</option>
+      <!-- Class and Subject Selection -->
+      <div class="mb-6">
+        <label class="block text-gray-700 font-medium mb-2">Pilih Kelas</label>
+        <select id="kelas" class="select-option w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <option value="">Pilih Kelas</option>
           <option value="7">Kelas 7</option>
           <option value="8">Kelas 8</option>
           <option value="9">Kelas 9</option>
         </select>
       </div>
       
-      <!-- Mapel Selection (Hidden Initially) -->
-      <div id="mapelContainer" class="hidden mb-6">
-        <label class="block text-gray-700 text-sm font-medium mb-2">
-          <i class="fas fa-book mr-1 text-indigo-500"></i> Pilih Mata Pelajaran
-        </label>
-        <select 
-          id="mapelSelect" 
-          class="w-full px-4 py-3 rounded-lg input-field select-field focus:outline-none"
-        >
-          <option value="">-- Pilih Mapel --</option>
-         <option value="SIM">SIMULASI</option>
-           <!--<option value="AGAMA">Agama</option>
-          <option value="BINDO">Bahasa Indonesia</option>
-          <option value="BING">Bahasa Inggris</option>
-          <option value="BAL">Bahasa Bali</option>
-          <option value="INF">Informatika</option>
+      <div class="mb-8">
+        <label class="block text-gray-700 font-medium mb-2">Pilih Mata Pelajaran</label>
+        <select id="mapel" class="select-option w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <option value="">Pilih Mapel</option>
           <option value="IPA">IPA</option>
           <option value="IPS">IPS</option>
-          <option value="PJOK">PJOK</option>
-          <option value="SENI">Seni Budaya</option>
-          <option value="PKN">PKN</option>
-          <option value="PRAK">Prakarya</option -->
+          <option value="MAT">Matematika</option>
         </select>
       </div>
       
-      <!-- Start Button (Hidden Initially) -->
-      <button 
-        id="mulaiBtn" 
-        class="w-full btn-primary text-white py-3 px-4 rounded-lg font-medium hidden"
-      >
+      <!-- Start Exam Button -->
+      <button onclick="mulaiUjian()" class="btn-primary w-full bg-green-500 hover:bg-green-600 text-white font-medium py-3 px-4 rounded-lg flex items-center justify-center">
         <i class="fas fa-play mr-2"></i> Mulai Ujian
       </button>
-      
-      <!-- Exam Info (Hidden Initially) -->
-      <div id="examInfo" class="hidden mt-6 p-4 bg-indigo-50 rounded-lg">
-        <div class="flex justify-between items-center">
-          <span class="text-sm text-indigo-800 font-medium">
-            <i class="fas fa-book-open mr-1"></i> Mata Pelajaran:
-          </span>
-          <span id="currentMapel" class="text-indigo-800 font-medium">-</span>
-        </div>
-      </div>
-    </div>
-    
-    <!-- Footer -->
-    <div class="text-center text-gray-500 text-sm">
-      <p>Sistem Ujian Digital © 2025 . SMP Negeri 1 Sukasada. Gede Pujana</p>
-      <p class="mt-1">
-        <i class="fas fa-shield-alt mr-1"></i> Mode aman diaktifkan
-      </p>
     </div>
   </div>
+
+  <!-- QR Scanner Library -->
+  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
   
-  <!-- Exam Frame (Hidden Initially) -->
-  <div id="examFrameContainer" class="hidden fixed inset-0 bg-white z-50 flex flex-col full-height">
-    <div class="bg-indigo-600 text-white p-4 flex justify-between items-center">
-      <div>
-        <span id="examTitle" class="font-medium"></span>
-        <span id="examTimer" class="ml-4"></span>
-      </div>
-      <button id="exitExamBtn" class="text-white hover:text-indigo-200">
-        <i class="fas fa-times text-xl"></i>
-      </button>
-    </div>
-    <iframe id="examFrame" class="flex-grow w-full" frameborder="0"></iframe>
-    
-    <!-- Exam Controls -->
-    <div class="exam-controls">
-      <button id="screenshotBtn" class="exam-control-btn" title="Ambil Screenshot">
-        <i class="fas fa-camera"></i>
-      </button>
-      <button id="fullscreenBtn" class="exam-control-btn" title="Mode Layar Penuh">
-        <i class="fas fa-expand"></i>
-      </button>
-    </div>
-  </div>
-
-  <!-- Violation Overlay (Hidden Initially) -->
-  <div id="violationOverlay" class="violation-overlay hidden">
-    <div class="violation-icon">
-      <i class="fas fa-exclamation-triangle"></i>
-    </div>
-    <div id="violationMessage" class="violation-message">
-      Anda terdeteksi menggunakan mode layar terpisah atau aplikasi lain!
-    </div>
-    <div class="violation-timer">
-      Ujian akan dihentikan dalam: <span id="violationTimer">5</span> detik
-    </div>
-  </div>
-
-  <!-- Hidden Canvas for Screenshots -->
-  <canvas id="screenshotCanvas"></canvas>
-
-  <!-- Audio Elements -->
-  <audio id="audioSukses" src="https://assets.mixkit.co/sfx/preview/mixkit-correct-answer-tone-2870.mp3" preload="auto"></audio>
-  <audio id="audioSalah" src="https://assets.mixkit.co/sfx/preview/mixkit-wrong-answer-fail-notification-946.mp3" preload="auto"></audio>
-  <audio id="audioAlarm" src="https://assets.mixkit.co/sfx/preview/mixkit-alarm-digital-clock-beep-989.mp3" preload="auto"></audio>
-  <audio id="audioStart" src="https://assets.mixkit.co/sfx/preview/mixkit-game-show-suspense-waiting-668.mp3" preload="auto"></audio>
-  <audio id="audioBeep" src="https://assets.mixkit.co/sfx/preview/mixkit-positive-interface-beep-221.mp3" preload="auto"></audio>
-  <audio id="audioShutter" src="https://assets.mixkit.co/sfx/preview/mixkit-camera-shutter-click-1124.mp3" preload="auto"></audio>
-
   <script>
-    // Configuration
-    const tokenRahasia = "UJIAN2025";
-    const SCREENSHOT_INTERVAL = 30000; // 30 seconds
-    const VIOLATION_TIMEOUT = 5000; // 5 seconds
-    
-    // Form links configuration
     const formLinks = {
-      "7-SIM" : "https://forms.gle/CTiCxBUZHR3dTGwL8",
-      "8-SIM" : "https://forms.gle/411wMh8fnwkJMKVG6",
-      "7-IPA": "https://forms.gle/link-kelas7-ipa",
-      "7-BINDO": "https://forms.gle/link-kelas7-bindo",
-      "8-IPA": "https://forms.gle/link-kelas8-ipa",
-      "9-PKN": "https://forms.gle/link-kelas9-pkn",
-      // Add more combinations as needed
+      "7-IPA": "https://forms.gle/4VjEEhcyPNcUUmHP6",
+      "8-IPS": "https://forms.gle/4VjEEhcyPNcUUmHP6",
+      "9-MAT": "https://forms.gle/4VjEEhcyPNcUUmHP6"
     };
+
+    let tokenDariQR = "";
+    let scannerActive = false;
+    let videoElement = null;
+    let canvasElement = null;
+    let canvasContext = null;
+    const tokenBenar = "UJIAN2025";
+
+    // Audio elements for sound notifications
+    const successSound = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-correct-answer-tone-2870.mp3');
+    const errorSound = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-wrong-answer-fail-notification-946.mp3');
+    const scanSound = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-quick-jump-arcade-game-239.mp3');
+
+    // Check if iPhone Safari
+    const isIphone = /iPhone|iPod/i.test(navigator.userAgent) && 
+                    /Safari/i.test(navigator.userAgent) && 
+                    !/CriOS|FxiOS/.test(navigator.userAgent);
     
-    // Mapel names for display
-    const mapelNames = {
-      "AGAMA": "Agama",
-      "BINDO": "Bahasa Indonesia",
-      "BING": "Bahasa Inggris",
-      "BAL": "Bahasa Bali",
-      "INF": "Informatika",
-      "IPA": "IPA",
-      "IPS": "IPS",
-      "PJOK": "PJOK",
-      "SENI": "Seni Budaya",
-      "PKN": "PKN",
-      "PRAK": "Prakarya",
-      "SIM" : "Simulasi",
-      "MAT" : "Matematika"
-    };
-    
-    // DOM Elements
-    const tokenInput = document.getElementById('tokenInput');
-    const togglePassword = document.getElementById('togglePassword');
-    const kelasSelect = document.getElementById('kelasSelect');
-    const mapelSelect = document.getElementById('mapelSelect');
-    const kelasContainer = document.getElementById('kelasContainer');
-    const mapelContainer = document.getElementById('mapelContainer');
-    const mulaiBtn = document.getElementById('mulaiBtn');
-    const peringatan = document.getElementById('peringatan');
-    const examInfo = document.getElementById('examInfo');
-    const currentMapel = document.getElementById('currentMapel');
-    const examFrameContainer = document.getElementById('examFrameContainer');
-    const examFrame = document.getElementById('examFrame');
-    const examTitle = document.getElementById('examTitle');
-    const exitExamBtn = document.getElementById('exitExamBtn');
-    const scanQRBtn = document.getElementById('scanQRBtn');
-    const qrScannerModal = document.getElementById('qrScannerModal');
-    const closeScannerBtn = document.getElementById('closeScannerBtn');
-    const switchCameraBtn = document.getElementById('switchCameraBtn');
-    const qrVideo = document.getElementById('qrVideo');
-    const screenshotBtn = document.getElementById('screenshotBtn');
-    const fullscreenBtn = document.getElementById('fullscreenBtn');
-    const screenshotCanvas = document.getElementById('screenshotCanvas');
-    const violationOverlay = document.getElementById('violationOverlay');
-    const violationMessage = document.getElementById('violationMessage');
-    const violationTimer = document.getElementById('violationTimer');
-    const examTimer = document.getElementById('examTimer');
-    
-    // Audio Elements
-    const audioSukses = document.getElementById('audioSukses');
-    const audioSalah = document.getElementById('audioSalah');
-    const audioAlarm = document.getElementById('audioAlarm');
-    const audioStart = document.getElementById('audioStart');
-    const audioBeep = document.getElementById('audioBeep');
-    const audioShutter = document.getElementById('audioShutter');
-    
-    // Variables
-    let qrStream = null;
-    let currentCamera = 'environment'; // back camera by default
-    let screenshotInterval;
-    let examStartTime;
-    let examDurationInterval;
-    let splitScreenCheckInterval;
-    let violationCountdown;
-    
-    // Toggle password visibility
-    togglePassword.addEventListener('click', () => {
-      const type = tokenInput.getAttribute('type') === 'password' ? 'text' : 'password';
-      tokenInput.setAttribute('type', type);
-      togglePassword.innerHTML = type === 'password' ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
-    });
-    
-    // Token validation
-    tokenInput.addEventListener('input', () => {
-      validateToken(tokenInput.value.trim());
-    });
-    
-    function validateToken(token) {
-      if (token === tokenRahasia) {
-        peringatan.textContent = '';
-        peringatan.classList.remove('text-red-500');
-        peringatan.classList.add('text-green-500');
-        peringatan.innerHTML = '<i class="fas fa-check-circle mr-1"></i> Token valid!';
-        kelasContainer.classList.remove('hidden');
-        audioSukses.play();
-        
-        // Add animation
-        kelasContainer.classList.add('animate__animated', 'animate__fadeIn');
-      } else {
-        kelasContainer.classList.add('hidden');
-        mapelContainer.classList.add('hidden');
-        mulaiBtn.classList.add('hidden');
-        examInfo.classList.add('hidden');
-        
-        if (token.length > 0) {
-          peringatan.textContent = 'Token salah. Silakan coba lagi.';
-          peringatan.classList.add('text-red-500');
-          peringatan.classList.remove('text-green-500');
-          audioSalah.play();
-        } else {
-          peringatan.textContent = '';
-        }
-      }
+    if (!isIphone) {
+      document.getElementById("formContainer").classList.add("hidden");
+      document.getElementById("peringatan").classList.remove("hidden");
+      errorSound.play();
     }
-    
-    // Kelas selection
-    kelasSelect.addEventListener('change', () => {
-      if (kelasSelect.value) {
-        mapelContainer.classList.remove('hidden');
-        mapelContainer.classList.add('animate__animated', 'animate__fadeIn');
-      } else {
-        mapelContainer.classList.add('hidden');
-        mulaiBtn.classList.add('hidden');
-        examInfo.classList.add('hidden');
-      }
-    });
-    
-    // Mapel selection
-    mapelSelect.addEventListener('change', () => {
-      if (mapelSelect.value) {
-        mulaiBtn.classList.remove('hidden');
-        examInfo.classList.remove('hidden');
-        currentMapel.textContent = mapelNames[mapelSelect.value] || '-';
-      } else {
-        mulaiBtn.classList.add('hidden');
-        examInfo.classList.add('hidden');
-      }
-    });
-    
-    // QR Scanner functionality
-    scanQRBtn.addEventListener('click', () => {
-      qrScannerModal.classList.remove('hidden');
-      startQRScanner();
-    });
-    
-    closeScannerBtn.addEventListener('click', () => {
-      stopQRScanner();
-      qrScannerModal.classList.add('hidden');
-    });
-    
-    switchCameraBtn.addEventListener('click', () => {
-      currentCamera = currentCamera === 'environment' ? 'user' : 'environment';
-      stopQRScanner();
-      startQRScanner();
-    });
-    
-    function startQRScanner() {
-      navigator.mediaDevices.getUserMedia({
-        video: {
-          facingMode: currentCamera,
-          width: { ideal: 1280 },
-          height: { ideal: 720 }
-        },
-        audio: false
-      }).then(stream => {
-        qrStream = stream;
-        qrVideo.srcObject = stream;
-        qrVideo.play();
-        
-        const canvasElement = document.createElement('canvas');
-        const canvas = canvasElement.getContext('2d');
-        
-        function scanQR() {
-          if (qrVideo.readyState === qrVideo.HAVE_ENOUGH_DATA) {
-            canvasElement.height = qrVideo.videoHeight;
-            canvasElement.width = qrVideo.videoWidth;
-            canvas.drawImage(qrVideo, 0, 0, canvasElement.width, canvasElement.height);
-            
-            const imageData = canvas.getImageData(0, 0, canvasElement.width, canvasElement.height);
-            const code = jsQR(imageData.data, imageData.width, imageData.height, {
-              inversionAttempts: 'dontInvert',
-            });
-            
-            if (code) {
-              audioBeep.play();
-              validateToken(code.data);
-              stopQRScanner();
-              qrScannerModal.classList.add('hidden');
-              return;
-            }
-          }
-          
-          requestAnimationFrame(scanQR);
-        }
-        
-        requestAnimationFrame(scanQR);
-      }).catch(err => {
-        console.error('Error accessing camera:', err);
-        Swal.fire({
-          icon: 'error',
-          title: 'Akses Kamera Gagal',
-          text: 'Tidak dapat mengakses kamera. Pastikan Anda memberikan izin akses kamera.',
-          confirmButtonText: 'OK',
-          background: '#ffffff'
-        });
-      });
-    }
-    
-    function stopQRScanner() {
-      if (qrStream) {
-        qrStream.getTracks().forEach(track => track.stop());
-        qrStream = null;
-      }
-      if (qrVideo.srcObject) {
-        qrVideo.srcObject = null;
-      }
-    }
-    
-    // Start exam
-    mulaiBtn.addEventListener('click', async () => {
-      const kelas = kelasSelect.value;
-      const mapel = mapelSelect.value;
-      const key = `${kelas}-${mapel}`;
-      const link = formLinks[key];
+
+    function startScanner() {
+      const scannerContainer = document.getElementById('scannerContainer');
+      const scanBtn = document.getElementById('scanBtn');
       
-      if (!link) {
-        showAlert('Kombinasi kelas dan mata pelajaran ini belum tersedia.', 'error');
+      scannerContainer.classList.remove('hidden');
+      scanBtn.classList.add('hidden');
+      scanSound.play();
+      
+      videoElement = document.getElementById('preview');
+      canvasElement = document.createElement('canvas');
+      canvasContext = canvasElement.getContext('2d');
+      
+      navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+        .then(function(stream) {
+          videoElement.srcObject = stream;
+          videoElement.setAttribute("playsinline", true);
+          videoElement.play();
+          scannerActive = true;
+          requestAnimationFrame(scanQR);
+        })
+        .catch(function(err) {
+          showAlert('error', 'Gagal mengakses kamera', err.message);
+          stopScanner();
+        });
+    }
+
+    function scanQR() {
+      if (!scannerActive) return;
+      
+      if (videoElement.readyState === videoElement.HAVE_ENOUGH_DATA) {
+        canvasElement.height = videoElement.videoHeight;
+        canvasElement.width = videoElement.videoWidth;
+        canvasContext.drawImage(videoElement, 0, 0, canvasElement.width, canvasElement.height);
+        
+        const imageData = canvasContext.getImageData(0, 0, canvasElement.width, canvasElement.height);
+        const code = jsQR(imageData.data, imageData.width, imageData.height, {
+          inversionAttempts: "dontInvert",
+        });
+        
+        if (code) {
+          tokenDariQR = code.data.trim();
+          verifyToken(tokenDariQR);
+          stopScanner();
+        }
+      }
+      
+      if (scannerActive) {
+        requestAnimationFrame(scanQR);
+      }
+    }
+
+    function verifyToken(token) {
+      if (token === tokenBenar) {
+        successSound.play();
+        showTokenScanned();
+      } else {
+        errorSound.play();
+        showAlert('error', 'Token salah', 'Token yang discan tidak valid');
+      }
+    }
+
+    function stopScanner() {
+      scannerActive = false;
+      
+      if (videoElement && videoElement.srcObject) {
+        videoElement.srcObject.getTracks().forEach(track => track.stop());
+      }
+      
+      document.getElementById('scannerContainer').classList.add('hidden');
+      document.getElementById('scanBtn').classList.remove('hidden');
+    }
+
+    function showTokenScanned() {
+      const tokenBadge = document.getElementById('tokenBadge');
+      tokenBadge.classList.remove('hidden');
+      
+      setTimeout(() => {
+        tokenBadge.classList.remove('token-badge');
+      }, 5000);
+    }
+
+    function mulaiUjian() {
+      const kelas = document.getElementById('kelas').value;
+      const mapel = document.getElementById('mapel').value;
+      const key = `${kelas}-${mapel}`;
+
+      if (!tokenDariQR) {
+        errorSound.play();
+        showAlert('error', 'Token belum discan', 'Silakan scan token QR terlebih dahulu');
         return;
       }
-      
-      // Play start sound
-      audioStart.play();
-      
-      // Show confirmation dialog
-      const confirmed = await showConfirmation(
-        'Konfirmasi Mulai Ujian',
-        `Anda akan memulai ujian ${mapelNames[mapel]} untuk kelas ${kelas}. Pastikan Anda siap sebelum memulai.`,
-        'Mulai Sekarang',
-        'Batalkan'
-      );
-      
-      if (!confirmed) return;
-      
-      try {
-        // Attempt fullscreen with different methods for different browsers
-        await requestFullscreen();
-      } catch (err) {
-        console.error('Fullscreen error:', err);
-        showAlert('Gagal masuk mode fullscreen. Lanjutkan manual.', 'warning');
+
+      if (tokenDariQR !== tokenBenar) {
+        errorSound.play();
+        showAlert('error', 'Token salah', 'Token yang discan tidak valid');
+        return;
       }
-      
-      // Show exam frame
-      examFrame.src = link;
-      examTitle.textContent = `Ujian ${mapelNames[mapel]} - Kelas ${kelas}`;
-      examFrameContainer.classList.remove('hidden');
-      
-      // Hide main interface
-      document.querySelector('.card').classList.add('hidden');
-      
-      // Start exam timer
-      examStartTime = new Date();
-      updateExamTimer();
-      examDurationInterval = setInterval(updateExamTimer, 1000);
-      
-      // Start screenshot interval
-      startScreenshotInterval();
-      
-      // Start split screen detection
-      startSplitScreenDetection();
-    });
-    
-    // Universal fullscreen request
-    async function requestFullscreen() {
-      const element = document.documentElement;
-      
-      // Standard method
-      if (element.requestFullscreen) {
-        await element.requestFullscreen();
-      } 
-      // WebKit (Safari)
-      else if (element.webkitRequestFullscreen) {
-        await element.webkitRequestFullscreen();
-      } 
-      // Firefox
-      else if (element.mozRequestFullScreen) {
-        await element.mozRequestFullScreen();
-      } 
-      // MS (Edge/IE)
-      else if (element.msRequestFullscreen) {
-        await element.msRequestFullscreen();
+
+      if (!kelas || !mapel) {
+        errorSound.play();
+        showAlert('error', 'Pilihan belum lengkap', 'Silakan pilih kelas dan mata pelajaran');
+        return;
       }
-      // iOS specific (not true fullscreen but hides UI)
-      else if (window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches) {
-        // Already in standalone mode
-      } 
-      // Fallback for browsers that don't support fullscreen
-      else {
-        // Add class to simulate fullscreen
-        document.body.classList.add('fullscreen');
-        
-        // For iOS, scroll to top and hide address bar
-        if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-          window.scrollTo(0, 1);
-        }
-        
-        // For Android Chrome, hide address bar
-        if (/Android/i.test(navigator.userAgent)) {
-          window.scrollTo(0, 1);
-        }
+
+      if (!formLinks[key]) {
+        errorSound.play();
+        showAlert('error', 'Form tidak tersedia', 'Form belum tersedia untuk kombinasi ini');
+        return;
       }
-    }
-    
-    // Update exam timer display
-    function updateExamTimer() {
-      const now = new Date();
-      const diff = new Date(now - examStartTime);
-      const hours = diff.getUTCHours().toString().padStart(2, '0');
-      const minutes = diff.getUTCMinutes().toString().padStart(2, '0');
-      const seconds = diff.getUTCSeconds().toString().padStart(2, '0');
-      examTimer.textContent = `${hours}:${minutes}:${seconds}`;
-    }
-    
-    // Start screenshot interval
-    function startScreenshotInterval() {
-      // Take initial screenshot
-      takeScreenshot();
+
+      successSound.play();
       
-      // Set interval for periodic screenshots
-      screenshotInterval = setInterval(takeScreenshot, SCREENSHOT_INTERVAL);
-    }
-    
-    // Take screenshot of exam
-    function takeScreenshot() {
-      // Play shutter sound
-      audioShutter.play();
-      
-      // Create canvas with same dimensions as exam frame
-      const iframe = examFrame;
-      const canvas = screenshotCanvas;
-      canvas.width = iframe.offsetWidth;
-      canvas.height = iframe.offsetHeight;
-      
-      // Draw iframe content to canvas (note: this only works for same-origin iframes)
-      try {
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(iframe, 0, 0, canvas.width, canvas.height);
-        
-        // Convert canvas to image data
-        const imageData = canvas.toDataURL('image/png');
-        
-        // Here you would typically send the screenshot to your server
-        console.log('Screenshot taken:', imageData);
-        
-        // Show notification
-        showScreenshotNotification();
-      } catch (err) {
-        console.error('Error taking screenshot:', err);
+      // Enter fullscreen
+      if (document.documentElement.requestFullscreen) {
+        document.documentElement.requestFullscreen();
       }
+
+      document.getElementById("formContainer").classList.add("hidden");
+
+      const iframe = document.createElement('iframe');
+      iframe.src = formLinks[key];
+      document.body.innerHTML = '';
+      document.body.appendChild(iframe);
     }
-    
-    // Show screenshot notification
-    function showScreenshotNotification() {
-      const notification = document.createElement('div');
-      notification.className = 'fixed bottom-4 left-4 bg-indigo-600 text-white px-4 py-2 rounded-lg shadow-lg flex items-center animate__animated animate__fadeInUp';
-      notification.innerHTML = `
-        <i class="fas fa-camera mr-2"></i>
-        <span>Screenshot diambil</span>
+
+    function showAlert(type, title, message) {
+      const alertDiv = document.createElement('div');
+      alertDiv.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg max-w-sm ${
+        type === 'error' ? 'bg-red-100 border-l-4 border-red-500 text-red-700' : 
+        'bg-green-100 border-l-4 border-green-500 text-green-700'
+      }`;
+      
+      alertDiv.innerHTML = `
+        <div class="flex items-start">
+          <div class="flex-shrink-0">
+            <i class="fas ${type === 'error' ? 'fa-exclamation-triangle' : 'fa-check-circle'} mr-2"></i>
+          </div>
+          <div>
+            <h3 class="font-bold">${title}</h3>
+            <p class="text-sm">${message}</p>
+          </div>
+          <button onclick="this.parentElement.parentElement.remove()" class="ml-auto -mx-1.5 -my-1.5 rounded-lg p-1.5 inline-flex items-center justify-center h-8 w-8 hover:bg-gray-200 focus:ring-2 focus:ring-gray-400">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
       `;
-      document.body.appendChild(notification);
+      
+      document.body.appendChild(alertDiv);
       
       setTimeout(() => {
-        notification.classList.add('animate__fadeOutDown');
-        setTimeout(() => notification.remove(), 500);
-      }, 3000);
+        alertDiv.remove();
+      }, 5000);
     }
-    
-    // Manual screenshot button
-    screenshotBtn.addEventListener('click', () => {
-      takeScreenshot();
-    });
-    
-    // Fullscreen button
-    fullscreenBtn.addEventListener('click', async () => {
-      try {
-        await requestFullscreen();
-      } catch (err) {
-        console.error('Fullscreen error:', err);
-      }
-    });
-    
-    // Start split screen detection
-    function startSplitScreenDetection() {
-      // Check initially
-      checkSplitScreen();
-      
-      // Set interval for periodic checks
-      splitScreenCheckInterval = setInterval(checkSplitScreen, 1000);
-    }
-    
-    // Check for split screen or other windows
-    function checkSplitScreen() {
-      // Method 1: Check window dimensions vs screen dimensions
-      const isSplitScreen = window.outerWidth < screen.availWidth * 0.9;
-      
-      // Method 2: Check if window is not in fullscreen
-      const isNotFullscreen = !document.fullscreenElement && 
-                             !document.webkitFullscreenElement && 
-                             !document.mozFullScreenElement && 
-                             !document.msFullscreenElement;
-      
-      // Method 3: Check if window is not focused (may indicate another window is active)
-      const isWindowNotFocused = !document.hasFocus();
-      
-      if (isSplitScreen || (isNotFullscreen && isWindowNotFocused)) {
-        handleViolation('Anda terdeteksi menggunakan mode layar terpisah atau aplikasi lain!');
-      }
-    }
-    
-    // Exit exam button
-    exitExamBtn.addEventListener('click', () => {
-      showExitConfirmation();
-    });
-    
-    // Fullscreen and visibility change handlers
+
+    // Proteksi keluar fullscreen
     document.addEventListener('fullscreenchange', () => {
-      if (!document.fullscreenElement && 
-          !document.webkitFullscreenElement && 
-          !document.mozFullScreenElement && 
-          !document.msFullscreenElement) {
-        handleViolation('Anda keluar dari mode fullscreen!');
+      if (!document.fullscreenElement) {
+        errorSound.play();
+        showAlert('error', 'Ujian dihentikan', 'Anda keluar dari mode fullscreen');
+        location.reload();
       }
     });
-    
-    document.addEventListener('webkitfullscreenchange', () => {
-      if (!document.webkitFullscreenElement) {
-        handleViolation('Anda keluar dari mode fullscreen!');
-      }
-    });
-    
-    document.addEventListener('mozfullscreenchange', () => {
-      if (!document.mozFullScreenElement) {
-        handleViolation('Anda keluar dari mode fullscreen!');
-      }
-    });
-    
-    document.addEventListener('msfullscreenchange', () => {
-      if (!document.msFullscreenElement) {
-        handleViolation('Anda keluar dari mode fullscreen!');
-      }
-    });
-    
-    document.addEventListener('visibilitychange', () => {
+
+    // Proteksi berpindah tab
+    document.addEventListener("visibilitychange", () => {
       if (document.hidden) {
-        handleViolation('Anda berpindah tab atau minimize browser!');
-      }
-    });
-    
-    // Window resize handler for split screen detection
-    window.addEventListener('resize', () => {
-      if (examFrameContainer.classList.contains('hidden')) return;
-      checkSplitScreen();
-    });
-    
-    // Window focus/blur handlers
-    window.addEventListener('blur', () => {
-      if (examFrameContainer.classList.contains('hidden')) return;
-      checkSplitScreen();
-    });
-    
-    // Violation handler
-    function handleViolation(message) {
-      // Show violation overlay
-      violationMessage.textContent = message;
-      violationOverlay.classList.remove('hidden');
-      audioAlarm.play();
-      
-      // Start countdown
-      let seconds = 5;
-      violationTimer.textContent = seconds;
-      violationCountdown = setInterval(() => {
-        seconds--;
-        violationTimer.textContent = seconds;
-        
-        if (seconds <= 0) {
-          clearInterval(violationCountdown);
-          endExamDueToViolation();
-        }
-      }, 1000);
-    }
-    
-    // End exam due to violation
-    function endExamDueToViolation() {
-      // Clear intervals
-      clearInterval(screenshotInterval);
-      clearInterval(examDurationInterval);
-      clearInterval(splitScreenCheckInterval);
-      clearInterval(violationCountdown);
-      
-      // Hide violation overlay
-      violationOverlay.classList.add('hidden');
-      
-      // Exit fullscreen
-      if (document.exitFullscreen) {
-        document.exitFullscreen();
-      } else if (document.webkitExitFullscreen) {
-        document.webkitExitFullscreen();
-      } else if (document.mozCancelFullScreen) {
-        document.mozCancelFullScreen();
-      } else if (document.msExitFullscreen) {
-        document.msExitFullscreen();
-      }
-      
-      // Remove fullscreen class
-      document.body.classList.remove('fullscreen');
-      
-      // Reload page
-      setTimeout(() => {
-        location.reload();
-      }, 1000);
-    }
-    
-    // UI Helper functions
-    function showAlert(message, type = 'info') {
-      const icon = {
-        error: 'exclamation-circle',
-        warning: 'exclamation-triangle',
-        success: 'check-circle',
-        info: 'info-circle'
-      }[type];
-      
-      Swal.fire({
-        icon: type,
-        title: message,
-        showConfirmButton: false,
-        timer: 3000,
-        timerProgressBar: true,
-        background: '#ffffff',
-        backdrop: `rgba(${type === 'error' ? '239,68,68' : '59,130,246'},0.2)`
-      });
-    }
-    
-    async function showConfirmation(title, text, confirmText, cancelText) {
-      return Swal.fire({
-        title: title,
-        text: text,
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonColor: '#4f46e5',
-        cancelButtonColor: '#6b7280',
-        confirmButtonText: `<i class="fas fa-play mr-2"></i> ${confirmText}`,
-        cancelButtonText: `<i class="fas fa-times mr-2"></i> ${cancelText}`,
-        background: '#ffffff',
-        backdrop: 'rgba(79, 70, 229, 0.1)'
-      }).then((result) => result.isConfirmed);
-    }
-    
-    async function showExitConfirmation() {
-      const confirmed = await showConfirmation(
-        'Keluar dari Ujian?',
-        'Anda yakin ingin keluar dari ujian? Semua progress akan hilang.',
-        'Ya, Keluar',
-        'Lanjutkan Ujian'
-      );
-      
-      if (confirmed) {
-        // Clear intervals
-        clearInterval(screenshotInterval);
-        clearInterval(examDurationInterval);
-        clearInterval(splitScreenCheckInterval);
-        
-        // Exit fullscreen
-        if (document.exitFullscreen) {
-          document.exitFullscreen();
-        } else if (document.webkitExitFullscreen) {
-          document.webkitExitFullscreen();
-        } else if (document.mozCancelFullScreen) {
-          document.mozCancelFullScreen();
-        } else if (document.msExitFullscreen) {
-          document.msExitFullscreen();
-        }
-        
-        // Remove fullscreen class
-        document.body.classList.remove('fullscreen');
-        
-        // Reload page
+        errorSound.play();
+        showAlert('error', 'Ujian dihentikan', 'Anda berpindah tab/browser');
         location.reload();
       }
-    }
-    
-    // Clean up on page unload
-    window.addEventListener('beforeunload', () => {
-      stopQRScanner();
     });
   </script>
 </body>
