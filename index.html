@@ -555,15 +555,6 @@
     let examDurationInterval;
     let splitScreenCheckInterval;
     let violationCountdown;
-    let lastWindowWidth = window.innerWidth;
-    let lastWindowHeight = window.innerHeight;
-    let lastScreenWidth = screen.width;
-    let lastScreenHeight = screen.height;
-    
-    // Enhanced split screen detection variables
-    let resizeCount = 0;
-    const MAX_RESIZE_COUNT = 3;
-    let isCheckingSplitScreen = false;
     
     // Toggle password visibility
     togglePassword.addEventListener('click', () => {
@@ -759,12 +750,6 @@
       
       // Start split screen detection
       startSplitScreenDetection();
-      
-      // Initialize window dimensions for split screen detection
-      lastWindowWidth = window.innerWidth;
-      lastWindowHeight = window.innerHeight;
-      lastScreenWidth = screen.width;
-      lastScreenHeight = screen.height;
     });
     
     // Universal fullscreen request
@@ -886,7 +871,7 @@
       }
     });
     
-    // Enhanced split screen detection
+    // Start split screen detection
     function startSplitScreenDetection() {
       // Check initially
       checkSplitScreen();
@@ -895,66 +880,22 @@
       splitScreenCheckInterval = setInterval(checkSplitScreen, 1000);
     }
     
-    // Enhanced check for split screen or other windows
+    // Check for split screen or other windows
     function checkSplitScreen() {
-      if (isCheckingSplitScreen) return;
-      isCheckingSplitScreen = true;
+      // Method 1: Check window dimensions vs screen dimensions
+      const isSplitScreen = window.outerWidth < screen.availWidth * 0.9;
       
-      try {
-        // Method 1: Check window dimensions vs screen dimensions
-        const windowWidth = window.innerWidth;
-        const windowHeight = window.innerHeight;
-        const screenWidth = screen.width;
-        const screenHeight = screen.height;
-        
-        // Calculate ratios
-        const widthRatio = windowWidth / screenWidth;
-        const heightRatio = windowHeight / screenHeight;
-        
-        // Check if window is significantly smaller than screen (possible split screen)
-        const isSplitScreen = widthRatio < 0.9 || heightRatio < 0.9;
-        
-        // Method 2: Check if window is not in fullscreen
-        const isNotFullscreen = !document.fullscreenElement && 
-                               !document.webkitFullscreenElement && 
-                               !document.mozFullScreenElement && 
-                               !document.msFullscreenElement;
-        
-        // Method 3: Check if window is not focused (may indicate another window is active)
-        const isWindowNotFocused = !document.hasFocus();
-        
-        // Method 4: Check for multiple resize events (common when adjusting split screen)
-        if (windowWidth !== lastWindowWidth || windowHeight !== lastWindowHeight) {
-          resizeCount++;
-          lastWindowWidth = windowWidth;
-          lastWindowHeight = windowHeight;
-        }
-        
-        // Method 5: Check for screen size changes (some devices report different sizes in split screen)
-        if (screenWidth !== lastScreenWidth || screenHeight !== lastScreenHeight) {
-          resizeCount++;
-          lastScreenWidth = screenWidth;
-          lastScreenHeight = screenHeight;
-        }
-        
-        // If multiple resize events detected or other violations found
-        if (isSplitScreen || (isNotFullscreen && isWindowNotFocused) || resizeCount >= MAX_RESIZE_COUNT) {
-          let violationMessage = '';
-          
-          if (resizeCount >= MAX_RESIZE_COUNT) {
-            violationMessage = 'Terlalu banyak perubahan ukuran layar terdeteksi!';
-          } else if (isSplitScreen) {
-            violationMessage = 'Anda terdeteksi menggunakan mode layar terpisah!';
-          } else if (isNotFullscreen && isWindowNotFocused) {
-            violationMessage = 'Anda berpindah ke aplikasi lain atau keluar dari mode fullscreen!';
-          }
-          
-          handleViolation(violationMessage);
-        }
-      } catch (err) {
-        console.error('Error in split screen detection:', err);
-      } finally {
-        isCheckingSplitScreen = false;
+      // Method 2: Check if window is not in fullscreen
+      const isNotFullscreen = !document.fullscreenElement && 
+                             !document.webkitFullscreenElement && 
+                             !document.mozFullScreenElement && 
+                             !document.msFullscreenElement;
+      
+      // Method 3: Check if window is not focused (may indicate another window is active)
+      const isWindowNotFocused = !document.hasFocus();
+      
+      if (isSplitScreen || (isNotFullscreen && isWindowNotFocused)) {
+        handleViolation('Anda terdeteksi menggunakan mode layar terpisah atau aplikasi lain!');
       }
     }
     
@@ -1038,9 +979,6 @@
       clearInterval(splitScreenCheckInterval);
       clearInterval(violationCountdown);
       
-      // Reset resize count
-      resizeCount = 0;
-      
       // Hide violation overlay
       violationOverlay.classList.add('hidden');
       
@@ -1113,14 +1051,11 @@
         clearInterval(examDurationInterval);
         clearInterval(splitScreenCheckInterval);
         
-        // Reset resize count
-        resizeCount = 0;
-        
         // Exit fullscreen
         if (document.exitFullscreen) {
           document.exitFullscreen();
         } else if (document.webkitExitFullscreen) {
-          document.exitFullscreen();
+          document.webkitExitFullscreen();
         } else if (document.mozCancelFullScreen) {
           document.mozCancelFullScreen();
         } else if (document.msExitFullscreen) {
