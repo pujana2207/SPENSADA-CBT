@@ -182,8 +182,20 @@
         <select id="mapel" class="select-option w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500">
           <option value="">Pilih Mapel</option>
           <option value="IPA">IPA</option>
+          <option value="BINDO">BAHASA INDONESIA</option>
+          <option value="BBALI">BAHASA BALI</option>
+          <option value="BING">BAHASA INGGRIS</option>
+          <option value="PKY">PRAKARYA</option>
+          <option value="SBUD">SENI BUDAYA</option>
+          <option value="MAT7AG">MATEMATIKA KELAS 7A-G</option>
+          <option value="MAT7H">MATEMATIKA KELAS 7H</option>
+          <option value="MAT8">MATEMATIKA KELAS 8</option>
+          <option value="TIK">INFORMATIKA</option>
+          <option value="AGMH">AGAMA HINDU</option>
+          <option value="PKN">PKN</option>
+          <option value="PJOK">PJOK</option>
           <option value="IPS">IPS</option>
-          <option value="MAT">Matematika</option>
+          
         </select>
       </div>
       
@@ -199,9 +211,29 @@
   
   <script>
     const formLinks = {
-      "7-IPA": "https://forms.gle/4VjEEhcyPNcUUmHP6",
-      "8-IPS": "https://forms.gle/4VjEEhcyPNcUUmHP6",
-      "9-MAT": "https://forms.gle/4VjEEhcyPNcUUmHP6"
+      "7-IPA": "https://docs.google.com/forms/d/e/1FAIpQLScwL5UtU9yJpkfZvPkqsW0h4leJOGs_lcDaALcxAW6-pWxLVQ/viewform?usp=dialog",
+      "7-IPS": "https://docs.google.com/forms/d/e/1FAIpQLSf2BCNwrnaDZyUWgsBmJz1hDIivtIxHynTVU8qRLHCJnX6XIA/viewform?usp=dialog",
+      "7-BINDO": "https://forms.gle/pV3umche6o4XU4Qh6",
+      "7-BBALI": "https://docs.google.com/forms/d/e/1FAIpQLSet2a93nADzlpjoTGEJgox1YA4VBrV93dMPiCYorscklMEHNg/viewform?usp=dialog",
+      "7-BING": "https://docs.google.com/forms/d/e/1FAIpQLSdsLub293M2bMTlenfwIrLTM10PiWoethp7tIUOZXV_UA4jgA/viewform?usp=dialog",
+      "7-PKY": "https://docs.google.com/forms/d/e/1FAIpQLSe8zdtM4FSl35cEprzfxU8kRCxbMuuKfm41lcgmCnN-bME55g/viewform?usp=dialog",
+      "7-MAT7AG": "https://forms.gle/pqS27ETNcdqtTPLz7",
+      "7-MAT7H": "https://forms.gle/XDLgjJQknRQKvHVH7",
+      "7-TIK": "https://docs.google.com/forms/d/e/1FAIpQLSfDBGvvuqqtCALRqzU_PHuiNjDemHFxeZz9oBfwSAN03by0RQ/viewform?usp=dialog",
+      "7-AGMH": "https://docs.google.com/forms/d/e/1FAIpQLSdKt9mAglmYns_iE7AQgZ29NQF-OYcJnNSTQ-8PDjn9YSp5iA/viewform?usp=dialog",
+      "7-PKN": "https://docs.google.com/forms/d/e/1FAIpQLSd1HEDQykzY6JKGEwqqGMG51ioVENhZl8VbCkFuwcRFjWgJ_w/viewform?usp=dialog",
+      "7-PJOK": "https://docs.google.com/forms/d/e/1FAIpQLScO6rA0DSL_Lv3bivkQ_8cuPnD0-oc0KAsqCNX7K6dtPEkzqA/viewform?usp=dialog",
+      "8-IPS": "https://docs.google.com/forms/d/e/1FAIpQLSf8P_-LzTxeU17A6b1IwWlV-y0fcED2VtzMNngDk2fl3D34-Q/viewform?usp=dialog",
+      "8-IPA": "https://docs.google.com/forms/d/e/1FAIpQLSeX3vsIYEp7kSVPm5MQ2jxiRTJqF9fAI7UNr-d1aK7y7difSg/viewform?usp=dialog",
+      "8-BINDO": "https://docs.google.com/forms/d/e/1FAIpQLSeiraP6EJpXpJfautXFcDY3xEecs3WavMCQkC9K3Fvn1YR43w/viewform?usp=dialog",
+      "8-BBALI": "https://docs.google.com/forms/d/e/1FAIpQLSdmBI_40lsR5ShfC_JF-nq3vZmsfAwO8vsDzXIro83ArHlilQ/viewform?usp=dialog",
+      "8-BING": "https://docs.google.com/forms/d/e/1FAIpQLSc0_ALDJOs9zqBrj7tbarrvkiZNJGQ_ir2z34ZQJ8ahiyQGxA/viewform?usp=dialog",
+      "8-SBUD": "https://docs.google.com/forms/d/e/1FAIpQLScl5MTVqVdjVC6kc7E-llmo6oZYqdtPHt5d0TXrQDQV_RP2Kw/viewform?usp=dialog",
+      "8-TIK": "https://docs.google.com/forms/d/e/1FAIpQLSfk-dqOFTb78ufZGmdawxb5u5isdLeuADB9CqmkCCjGa5gEjQ/viewform?usp=dialog",
+      "8-AGMH": "https://docs.google.com/forms/d/e/1FAIpQLSc7WdqZnM1cOjqu0bdCNe0oK5dakhp5INV0EtmpThIGiJA0BA/viewform?usp=dialog",
+      "8-PKN": "https://docs.google.com/forms/d/e/1FAIpQLScvskqXeuSBjEmJr7-YCQInzDLMrdQVPw8H6Q6zdKg0MFt6bA/viewform?usp=dialog",
+      "8-PJOK": "https://docs.google.com/forms/d/e/1FAIpQLSefwm0RjEIVnC4wGprF4WtGDIQbH4Op96tqOa_hK_aYHUnyRw/viewform?usp=dialog",
+      "8-MAT8": "https://docs.google.com/forms/d/e/1FAIpQLScIidC9-Dz-t-sgJXMfqy06HcFQA51iPMvUWGREqK6VMw-Auw/viewform?usp=dialog"
     };
 
     let tokenDariQR = "";
